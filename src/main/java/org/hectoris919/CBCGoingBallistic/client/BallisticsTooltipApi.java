@@ -163,7 +163,7 @@ public final class BallisticsTooltipApi {
 	}
 
 	private static double estimateBigCartridgeChargeEquivalents(ItemStack stack) {
-		int storedPower = getIntComponent(stack);
+		int storedPower = stack.getOrDefault(CBCDataComponents.POWER, 0);
 		if (storedPower <= 0) return 0.0D;
 
 		return storedPower <= 4
@@ -219,10 +219,6 @@ public final class BallisticsTooltipApi {
 			GoingBallistic.LOGGER.debug("Could not read fluid shell item payload for tooltip", ex);
 			return null;
 		}
-	}
-
-	private static int getIntComponent(ItemStack stack) {
-		return stack.getOrDefault(CBCDataComponents.POWER, 0);
 	}
 
 	private static CustomData getCustomDataComponent(ItemStack stack) {
