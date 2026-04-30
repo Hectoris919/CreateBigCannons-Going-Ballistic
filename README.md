@@ -38,8 +38,6 @@ This formula requires projectiles to have mass, so I estimated the weight of eve
 |Autocannon Shell (AP)|33.9 kg|
 |Machine Gun Bullet|0.012 kg|
 
-The amount of chemical energy within
-
 ## TODO:
 - [x] Implement the base mod
 - [ ] Add a ponder animation to the Powder Charge that shows how a cannon's size, amount of propellant, and shell type affects the projectile's trajectory with the new ballistics formula
