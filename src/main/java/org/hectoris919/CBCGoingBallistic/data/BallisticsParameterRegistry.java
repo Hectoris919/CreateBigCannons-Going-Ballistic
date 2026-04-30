@@ -25,27 +25,27 @@ public final class BallisticsParameterRegistry {
 				: Config.velocityMultiplier();
 	}
 
-	public static double cannonPowderMassPerChargeKg() {
-		return overrides.cannonPowderMassPerChargeKg != null
-				? overrides.cannonPowderMassPerChargeKg
+	public static double cannonPowderMass() {
+		return overrides.cannonPowderMass != null
+				? overrides.cannonPowderMass
 				: Config.powderChargeMass();
 	}
 
 	public static double cannonChargeLengthPerChargeMeters() {
-		return overrides.cannonChargeLengthPerChargeMeters != null
-				? overrides.cannonChargeLengthPerChargeMeters
+		return overrides.cannonChargeDiameter != null
+				? overrides.cannonChargeDiameter
 				: Config.powderChargeDiameter();
 	}
 
-	public static double autocannonPowderMassKg() {
-		return overrides.autocannonPowderMassKg != null
-				? overrides.autocannonPowderMassKg
+	public static double autocannonPowderMass() {
+		return overrides.autocannonPowderMass != null
+				? overrides.autocannonPowderMass
 				: Config.autocannonPowderMass();
 	}
 
-	public static double autocannonChargeLengthMeters() {
-		return overrides.autocannonChargeLengthMeters != null
-				? overrides.autocannonChargeLengthMeters
+	public static double autocannonCartridgeDiameter() {
+		return overrides.autocannonCartridgeDiameter != null
+				? overrides.autocannonCartridgeDiameter
 				: Config.autocannonCartridgeDiameter();
 	}
 
@@ -62,11 +62,10 @@ public final class BallisticsParameterRegistry {
 		private final Double velocityMultiplier;
 		private final Double maxMuzzleVelocityMps;
 		private final Double minBarrelToChargeLengthRatio;
-		private final Double cannonPowderMassPerChargeKg;
-		private final Double cannonChargeLengthPerChargeMeters;
-		private final Double autocannonPowderMassKg;
-
-		private final Double autocannonChargeLengthMeters;
+		private final Double cannonPowderMass;
+		private final Double cannonChargeDiameter;
+		private final Double autocannonPowderMass;
+		private final Double autocannonCartridgeDiameter;
 		private final Double blackPowderEnergyJoulesPerKg;
 
 		public Overrides(
@@ -74,20 +73,20 @@ public final class BallisticsParameterRegistry {
 				Double velocityMultiplier,
 				Double maxMuzzleVelocityMps,
 				Double minBarrelToChargeLengthRatio,
-				Double cannonPowderMassPerChargeKg,
-				Double cannonChargeLengthPerChargeMeters,
-				Double autocannonPowderMassKg,
-				Double autocannonChargeLengthMeters,
+				Double cannonPowderMass,
+				Double cannonChargeDiameter,
+				Double autocannonPowderMass,
+				Double autocannonCartridgeDiameter,
 				Double blackPowderEnergyJoulesPerKg
 		) {
 			this.robinsConstantMps = robinsConstantMps;
 			this.velocityMultiplier = velocityMultiplier;
 			this.maxMuzzleVelocityMps = maxMuzzleVelocityMps;
 			this.minBarrelToChargeLengthRatio = minBarrelToChargeLengthRatio;
-			this.cannonPowderMassPerChargeKg = cannonPowderMassPerChargeKg;
-			this.cannonChargeLengthPerChargeMeters = cannonChargeLengthPerChargeMeters;
-			this.autocannonPowderMassKg = autocannonPowderMassKg;
-			this.autocannonChargeLengthMeters = autocannonChargeLengthMeters;
+			this.cannonPowderMass = cannonPowderMass;
+			this.cannonChargeDiameter = cannonChargeDiameter;
+			this.autocannonPowderMass = autocannonPowderMass;
+			this.autocannonCartridgeDiameter = autocannonCartridgeDiameter;
 			this.blackPowderEnergyJoulesPerKg = blackPowderEnergyJoulesPerKg;
 		}
 
@@ -96,10 +95,10 @@ public final class BallisticsParameterRegistry {
 					&& this.velocityMultiplier == null
 					&& this.maxMuzzleVelocityMps == null
 					&& this.minBarrelToChargeLengthRatio == null
-					&& this.cannonPowderMassPerChargeKg == null
-					&& this.cannonChargeLengthPerChargeMeters == null
-					&& this.autocannonPowderMassKg == null
-					&& this.autocannonChargeLengthMeters == null
+					&& this.cannonPowderMass == null
+					&& this.cannonChargeDiameter == null
+					&& this.autocannonPowderMass == null
+					&& this.autocannonCartridgeDiameter == null
 					&& this.blackPowderEnergyJoulesPerKg == null;
 		}
 	}
@@ -109,20 +108,20 @@ public final class BallisticsParameterRegistry {
 		private Double velocityMultiplier;
 		private Double maxMuzzleVelocityMps;
 		private Double minBarrelToChargeLengthRatio;
-		private Double cannonPowderMassPerChargeKg;
-		private Double cannonChargeLengthPerChargeMeters;
-		private Double autocannonPowderMassKg;
-		private Double autocannonChargeLengthMeters;
+		private Double cannonPowderMass;
+		private Double cannonChargeDiameter;
+		private Double autocannonPowderMass;
+		private Double autocannonCartridgeDiameter;
 		private Double blackPowderEnergyJoulesPerKg;
 
 		void robinsConstantMps(double value) { this.robinsConstantMps = value; }
 		void velocityMultiplier(double value) { this.velocityMultiplier = value; }
 		void maxMuzzleVelocityMps(double value) { this.maxMuzzleVelocityMps = value; }
 		void minBarrelToChargeLengthRatio(double value) { this.minBarrelToChargeLengthRatio = value; }
-		void cannonPowderMassPerChargeKg(double value) { this.cannonPowderMassPerChargeKg = value; }
-		void cannonChargeLengthPerChargeMeters(double value) { this.cannonChargeLengthPerChargeMeters = value; }
-		void autocannonPowderMassKg(double value) { this.autocannonPowderMassKg = value; }
-		void autocannonChargeLengthMeters(double value) { this.autocannonChargeLengthMeters = value; }
+		void cannonPowderMass(double value) { this.cannonPowderMass = value; }
+		void cannonChargeDiameter(double value) { this.cannonChargeDiameter = value; }
+		void autocannonPowderMass(double value) { this.autocannonPowderMass = value; }
+		void autocannonCartridgeDiameter(double value) { this.autocannonCartridgeDiameter = value; }
 		void blackPowderEnergyJoulesPerKg(double value) { this.blackPowderEnergyJoulesPerKg = value; }
 
 		Overrides build() {
@@ -131,10 +130,10 @@ public final class BallisticsParameterRegistry {
 					this.velocityMultiplier,
 					this.maxMuzzleVelocityMps,
 					this.minBarrelToChargeLengthRatio,
-					this.cannonPowderMassPerChargeKg,
-					this.cannonChargeLengthPerChargeMeters,
-					this.autocannonPowderMassKg,
-					this.autocannonChargeLengthMeters,
+					this.cannonPowderMass,
+					this.cannonChargeDiameter,
+					this.autocannonPowderMass,
+					this.autocannonCartridgeDiameter,
 					this.blackPowderEnergyJoulesPerKg
 			);
 		}

@@ -49,11 +49,11 @@ public final class BallisticProjectileHelper {
 		double projectileMassKg = getProjectileMassKg(projectile, Config.autocannonProjectileMassFallback());
 		double barrelLengthMeters = estimateMountedBarrelLengthMeters(contraption);
 		double powderMassKg = properties == null
-				? BallisticsParameterRegistry.autocannonPowderMassKg()
-				: properties.autocannonPowderMassKgOr(BallisticsParameterRegistry.autocannonPowderMassKg());
+				? BallisticsParameterRegistry.autocannonPowderMass()
+				: properties.autocannonPowderMassKgOr(BallisticsParameterRegistry.autocannonPowderMass());
 		double chargeLengthMeters = properties == null
-				? BallisticsParameterRegistry.autocannonChargeLengthMeters()
-				: properties.autocannonChargeLengthMetersOr(BallisticsParameterRegistry.autocannonChargeLengthMeters());
+				? BallisticsParameterRegistry.autocannonCartridgeDiameter()
+				: properties.autocannonChargeLengthMetersOr(BallisticsParameterRegistry.autocannonCartridgeDiameter());
 		double localVelocityMultiplier = properties == null
 				? 1.0D
 				: properties.autocannonVelocityMultiplierOr(1.0D);
@@ -203,7 +203,7 @@ public final class BallisticProjectileHelper {
 		if (!Config.debugBallistics()) return;
 
 		double chargeEquivalent = cbcChargePower / 2.0D;
-		double powderMassKg = chargeEquivalent * BallisticsParameterRegistry.cannonPowderMassPerChargeKg();
+		double powderMassKg = chargeEquivalent * BallisticsParameterRegistry.cannonPowderMass();
 		double chargeLengthMeters = chargeEquivalent * BallisticsParameterRegistry.cannonChargeLengthPerChargeMeters();
 
 		GoingBallistic.LOGGER.info(

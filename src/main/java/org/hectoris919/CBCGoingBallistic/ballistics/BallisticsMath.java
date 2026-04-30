@@ -40,7 +40,7 @@ public final class BallisticsMath {
 	public static double getCannonVelocityMps(double projectileMassKg, double powderCharges, double barrelLengthMeters) {
 		if (!Double.isFinite(powderCharges) || powderCharges <= 0.0D) return 0.0D;
 
-		double powderMassKg = powderCharges * BallisticsParameterRegistry.cannonPowderMassPerChargeKg();
+		double powderMassKg = powderCharges * BallisticsParameterRegistry.cannonPowderMass();
 		double chargeLengthMeters = powderCharges * BallisticsParameterRegistry.cannonChargeLengthPerChargeMeters();
 
 		return getRobinsVelocityMps(projectileMassKg, powderMassKg, chargeLengthMeters, barrelLengthMeters);

@@ -58,10 +58,10 @@ public class BallisticsParameterReloadListener extends SimpleJsonResourceReloadL
 		count += readPositive(json, fileId, "velocity_multiplier", builder::velocityMultiplier);
 		count += readNonNegative(json, fileId, "max_muzzle_velocity_mps", builder::maxMuzzleVelocityMps);
 		count += readPositive(json, fileId, "min_barrel_to_charge_length_ratio", builder::minBarrelToChargeLengthRatio);
-		count += readPositive(json, fileId, "big_cannon_powder_mass_per_charge_kg", builder::cannonPowderMassPerChargeKg);
-		count += readPositive(json, fileId, "big_cannon_charge_length_per_charge_m", builder::cannonChargeLengthPerChargeMeters);
-		count += readPositive(json, fileId, "autocannon_powder_mass_kg", builder::autocannonPowderMassKg);
-		count += readPositive(json, fileId, "autocannon_charge_length_m", builder::autocannonChargeLengthMeters);
+		count += readPositive(json, fileId, "big_cannon_powder_mass_per_charge_kg", builder::cannonPowderMass);
+		count += readPositive(json, fileId, "big_cannon_charge_length_per_charge_m", builder::cannonChargeDiameter);
+		count += readPositive(json, fileId, "autocannon_powder_mass_kg", builder::autocannonPowderMass);
+		count += readPositive(json, fileId, "autocannon_charge_length_m", builder::autocannonCartridgeDiameter);
 		count += readPositive(json, fileId, "black_powder_energy_j_per_kg", builder::blackPowderEnergyJoulesPerKg);
 		return count;
 	}
