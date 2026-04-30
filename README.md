@@ -24,7 +24,7 @@ This formula requires projectiles to have mass, so I estimated the weight of eve
 
 I based the mass of gunpowder inside a powder charge off of what's visible on the block and assumed it was a solid column of gunpowder. When a Big Cartridge is full of gunpowder (4/4), it contains 4x more gunpowder than a regular powder charge, so I based the gunpowder mass off of the cartridge's power level. The autocannon's gunpowder mass was just assumed to be the volume of a filled autocannon cartridge:
 
-| Shell | Mass |
+| Shell | Shell Mass |
 |-------|-----------|
 |Solid Shot|3519.5 kg|
 |AP Shot|3455.5 kg|
@@ -40,7 +40,7 @@ I based the mass of gunpowder inside a powder charge off of what's visible on th
 |Autocannon Shell (Flak)|32.1 kg|
 |Machine Gun Bullet|0.012 kg|
 
-| Propellant | Mass |
+| Propellant | Gunpowder Mass |
 |-----------------|------|
 |Big Cartridge (Power: 4/4)|252.0605 kg|
 |Big Cartridge (Power: 3/4)|189.0454 kg|
