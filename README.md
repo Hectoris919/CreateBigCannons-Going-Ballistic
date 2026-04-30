@@ -22,7 +22,7 @@ $$
 
 This formula requires projectiles to have mass, so I estimated the weight of every projectile by assuming that the solid shot was entirely made of iron, calculating its volume, then basing the weight of the other projectiles off of the amount of iron items in their recipes. The machine gun round's mass looked similar to a 7.62x51mm / .308 round, just wider, so I took that round's IRL mass and increased it a bit.
 
-I based the mass of gunpowder inside a powder charge off of what's visible on the block and assumed it was a solid column of gunpowder. When a Big Cartridge is full of gunpowder (4/4), it contains 4x more gunpowder than a regular powder charge, so I based the gunpowder mass off of the cartridge's power level. The autocannon's gunpowder mass was just assumed to be the volume of a filled autocannon cartridge:
+I based the mass of gunpowder inside a powder charge off of what's visible on the block and assumed it was a solid column of gunpowder. When a Big Cartridge is full of gunpowder (Power: 4/4), it contains 4x more gunpowder than a regular powder charge, so I based the gunpowder mass off of the cartridge's power level. The autocannon's gunpowder mass was just assumed to be the volume of a filled autocannon cartridge:
 
 | Projectile | Mass |
 |-------|-----------|
