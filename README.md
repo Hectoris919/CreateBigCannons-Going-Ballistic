@@ -20,7 +20,7 @@ $$
 \end{align}
 $$
 
-This formula requires projectiles to have mass, so I estimated the weight of every projectile by assuming that the solid shot was entirely made of iron, calculating its volume, then basing the weight of the other projectiles off of the amount of iron items in their recipes. The machine gun round's mass looked similar to a 7.62x51mm / .308 round, just wider, so I took that round's mass and scaled it up a bit:
+This formula requires projectiles to have mass, so I estimated the weight of every projectile by assuming that the solid shot was entirely made of iron, calculating its volume, then basing the weight of the other projectiles off of the amount of iron items in their recipes. The machine gun round's mass looked similar to a 7.62x51mm / .308 round, just wider, so I took that round's IRL mass and increased it a bit:
 
 | Shell | Mass |
 |-------|-----------|
