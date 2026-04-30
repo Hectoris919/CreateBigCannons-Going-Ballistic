@@ -34,8 +34,8 @@ This formula requires projectiles to have mass, so I estimated the weight of eve
 |Mortar Stone|1162.3 kg|
 |Smoke Shell|1037.0 kg|
 |Grapeshot Shell|731.1 kg|
-|Autocannon Shell (Flak)|32.1 kg|
 |Autocannon Shell (AP)|33.9 kg|
+|Autocannon Shell (Flak)|32.1 kg|
 |Machine Gun Bullet|0.012 kg|
 
 ## TODO:
