@@ -3,7 +3,7 @@
   <h1>Create Big Cannons: Going Ballistic</h1>
 </div>
 
-Create Big Cannons: Going Ballistic is a mod that significantly increases speed of Create: Big Cannons projectiles, improving the range of cannons. Create: Big Cannon's ballistics model is inaccurate, the range of a cannon scaling linearly with the amount of powder charges loaded into it, and powder charges don't seem to push the projectiles as fast as they should. This mod changes that. It does so by changing the ballistics formula used for velocity calculation to the one [Benjamin Robins developed](https://www.arc.id.au/CannonBallistics.html) in 1742:
+Create Big Cannons: Going Ballistic is a mod that significantly increases the speed of Create: Big Cannons projectiles, improving the range of cannons. Create: Big Cannon's ballistics model is inaccurate, the range of a cannon scaling linearly with the amount of powder charges loaded into it, and powder charges don't seem to push the projectiles as fast as they should. This mod changes that. It does so by changing the ballistics formula used for velocity calculation to the one [Benjamin Robins developed](https://www.arc.id.au/CannonBallistics.html) in 1742:
 
 $$
 \begin{flalign}
