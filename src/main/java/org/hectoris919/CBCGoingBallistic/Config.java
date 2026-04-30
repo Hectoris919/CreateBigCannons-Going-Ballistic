@@ -96,7 +96,7 @@ public class Config {
 	public static double robinsConstantMps() { return ROBINS_CONSTANT_MPS.get(); }
 	public static double powderChargeMass() { return POWDER_CHARGE_MASS.get(); }
 	public static double powderChargeDiameter() { return POWDER_CHARGE_DIAMETER.get(); }
-	public static double autocannonPowderMassKg() { return AUTOCANNON_POWDER_MASS.get(); }
+	public static double autocannonPowderMass() { return AUTOCANNON_POWDER_MASS.get(); }
 	public static double autocannonCartridgeDiameter() { return AUTOCANNON_CARTRIDGE_DIAMETER.get(); }
 	public static double blackPowderEnergyJoulesPerKg() { return BLACK_POWDER_ENERGY_J_PER_KG.get(); }
 	public static double joulesPerToughnessPoint() { return JOULES_PER_TOUGHNESS_POINT.get(); }

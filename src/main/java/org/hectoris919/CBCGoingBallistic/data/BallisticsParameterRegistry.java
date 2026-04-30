@@ -40,7 +40,7 @@ public final class BallisticsParameterRegistry {
 	public static double autocannonPowderMassKg() {
 		return overrides.autocannonPowderMassKg != null
 				? overrides.autocannonPowderMassKg
-				: Config.autocannonPowderMassKg();
+				: Config.autocannonPowderMass();
 	}
 
 	public static double autocannonChargeLengthMeters() {
