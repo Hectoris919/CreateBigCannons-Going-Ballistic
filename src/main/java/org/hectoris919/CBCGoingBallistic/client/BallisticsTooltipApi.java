@@ -71,7 +71,7 @@ public final class BallisticsTooltipApi {
 			if (properties != null) {
 				addHeaderIfNeeded(tooltip, headerAdded);
 				headerAdded = true;
-				appendProjectileMassLine(stack, projectileId.get(), properties, tooltip);
+				appendProjectileMassLine(stack, properties, tooltip);
 				appendSafeChargeLine(properties, tooltip);
 			}
 		}
@@ -113,7 +113,7 @@ public final class BallisticsTooltipApi {
 		return Optional.empty();
 	}
 
-	private static void appendProjectileMassLine(ItemStack stack, ResourceLocation projectileId, ProjectileMassProperties properties, List<Component> tooltip) {
+	private static void appendProjectileMassLine(ItemStack stack, ProjectileMassProperties properties, List<Component> tooltip) {
 		double massKg = properties.fluidContainer()
 				? getFluidShellMassKg(stack, properties)
 				: properties.massKg();

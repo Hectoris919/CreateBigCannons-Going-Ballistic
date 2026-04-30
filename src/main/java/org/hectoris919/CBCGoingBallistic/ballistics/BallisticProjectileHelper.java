@@ -95,8 +95,6 @@ public final class BallisticProjectileHelper {
 		if (projectile == null) return fallbackMassKg;
 
 		ResourceLocation projectileId = getProjectileId(projectile);
-		if (projectileId == null) return fallbackMassKg;
-
 		ProjectileMassProperties properties = ProjectileMassRegistry.getProperties(projectileId).orElse(null);
 		if (properties == null) {
 			if (Config.debugBallistics()) GoingBallistic.LOGGER.info("[Going Ballistic] No mass entry for {}; using fallback {} kg", projectileId, fallbackMassKg);
