@@ -8,7 +8,7 @@ public final class BallisticsMath {
 	private BallisticsMath() { }
 
 	/**
-	 * ARC/Robins cannon formula:
+	 * Robins cannon formula:
 	 * v = K * sqrt((p / (m + p / 3)) * ln(L / c))
 	 *
 	 * @param projectileMassKg projectile mass m, in kg
