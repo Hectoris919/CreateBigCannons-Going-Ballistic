@@ -56,12 +56,10 @@ public final class BallisticsParameterRegistry {
 	}
 
 	public static final class Overrides {
-		public static final Overrides EMPTY = new Overrides(null, null, null, null, null, null, null, null, null);
+		public static final Overrides EMPTY = new Overrides( null, null, null, null, null, null, null);
 
 		private final Double robinsConstantMps;
 		private final Double velocityMultiplier;
-		private final Double maxMuzzleVelocityMps;
-		private final Double minBarrelToChargeLengthRatio;
 		private final Double cannonPowderMass;
 		private final Double cannonChargeDiameter;
 		private final Double autocannonPowderMass;
@@ -71,8 +69,6 @@ public final class BallisticsParameterRegistry {
 		public Overrides(
 				Double robinsConstantMps,
 				Double velocityMultiplier,
-				Double maxMuzzleVelocityMps,
-				Double minBarrelToChargeLengthRatio,
 				Double cannonPowderMass,
 				Double cannonChargeDiameter,
 				Double autocannonPowderMass,
@@ -81,8 +77,6 @@ public final class BallisticsParameterRegistry {
 		) {
 			this.robinsConstantMps = robinsConstantMps;
 			this.velocityMultiplier = velocityMultiplier;
-			this.maxMuzzleVelocityMps = maxMuzzleVelocityMps;
-			this.minBarrelToChargeLengthRatio = minBarrelToChargeLengthRatio;
 			this.cannonPowderMass = cannonPowderMass;
 			this.cannonChargeDiameter = cannonChargeDiameter;
 			this.autocannonPowderMass = autocannonPowderMass;
@@ -93,8 +87,6 @@ public final class BallisticsParameterRegistry {
 		public boolean isEmpty() {
 			return this.robinsConstantMps == null
 					&& this.velocityMultiplier == null
-					&& this.maxMuzzleVelocityMps == null
-					&& this.minBarrelToChargeLengthRatio == null
 					&& this.cannonPowderMass == null
 					&& this.cannonChargeDiameter == null
 					&& this.autocannonPowderMass == null
@@ -106,8 +98,6 @@ public final class BallisticsParameterRegistry {
 	static final class Builder {
 		private Double robinsConstantMps;
 		private Double velocityMultiplier;
-		private Double maxMuzzleVelocityMps;
-		private Double minBarrelToChargeLengthRatio;
 		private Double cannonPowderMass;
 		private Double cannonChargeDiameter;
 		private Double autocannonPowderMass;
@@ -116,8 +106,6 @@ public final class BallisticsParameterRegistry {
 
 		void robinsConstantMps(double value) { this.robinsConstantMps = value; }
 		void velocityMultiplier(double value) { this.velocityMultiplier = value; }
-		void maxMuzzleVelocityMps(double value) { this.maxMuzzleVelocityMps = value; }
-		void minBarrelToChargeLengthRatio(double value) { this.minBarrelToChargeLengthRatio = value; }
 		void cannonPowderMass(double value) { this.cannonPowderMass = value; }
 		void cannonChargeDiameter(double value) { this.cannonChargeDiameter = value; }
 		void autocannonPowderMass(double value) { this.autocannonPowderMass = value; }
@@ -128,8 +116,6 @@ public final class BallisticsParameterRegistry {
 			return new Overrides(
 					this.robinsConstantMps,
 					this.velocityMultiplier,
-					this.maxMuzzleVelocityMps,
-					this.minBarrelToChargeLengthRatio,
 					this.cannonPowderMass,
 					this.cannonChargeDiameter,
 					this.autocannonPowderMass,

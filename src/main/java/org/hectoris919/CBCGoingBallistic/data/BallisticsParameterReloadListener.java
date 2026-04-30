@@ -56,12 +56,10 @@ public class BallisticsParameterReloadListener extends SimpleJsonResourceReloadL
 		int count = 0;
 		count += readPositive(json, fileId, "robins_constant_mps", builder::robinsConstantMps);
 		count += readPositive(json, fileId, "velocity_multiplier", builder::velocityMultiplier);
-		count += readNonNegative(json, fileId, "max_muzzle_velocity_mps", builder::maxMuzzleVelocityMps);
-		count += readPositive(json, fileId, "min_barrel_to_charge_length_ratio", builder::minBarrelToChargeLengthRatio);
-		count += readPositive(json, fileId, "big_cannon_powder_mass_per_charge_kg", builder::cannonPowderMass);
-		count += readPositive(json, fileId, "big_cannon_charge_length_per_charge_m", builder::cannonChargeDiameter);
-		count += readPositive(json, fileId, "autocannon_powder_mass_kg", builder::autocannonPowderMass);
-		count += readPositive(json, fileId, "autocannon_charge_length_m", builder::autocannonCartridgeDiameter);
+		count += readPositive(json, fileId, "cannon_powder_mass", builder::cannonPowderMass);
+		count += readPositive(json, fileId, "cannon_charge_diameter", builder::cannonChargeDiameter);
+		count += readPositive(json, fileId, "autocannon_powder_mass", builder::autocannonPowderMass);
+		count += readPositive(json, fileId, "autocannon_charge_diameter", builder::autocannonCartridgeDiameter);
 		count += readPositive(json, fileId, "black_powder_energy_j_per_kg", builder::blackPowderEnergyJoulesPerKg);
 		return count;
 	}
@@ -72,18 +70,6 @@ public class BallisticsParameterReloadListener extends SimpleJsonResourceReloadL
 		double value = GsonHelper.getAsDouble(json, key);
 		if (!Double.isFinite(value) || value <= 0.0D) {
 			GoingBallistic.LOGGER.warn("Ignoring {}={} in {} because it must be positive and finite", key, value, fileId);
-			return 0;
-		}
-		setter.accept(value);
-		return 1;
-	}
-
-	private static int readNonNegative(JsonObject json, ResourceLocation fileId, String key, DoubleConsumer setter) {
-		if (!json.has(key)) return 0;
-
-		double value = GsonHelper.getAsDouble(json, key);
-		if (!Double.isFinite(value) || value < 0.0D) {
-			GoingBallistic.LOGGER.warn("Ignoring {}={} in {} because it must be non-negative and finite", key, value, fileId);
 			return 0;
 		}
 		setter.accept(value);

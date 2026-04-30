@@ -30,7 +30,7 @@ public class Config {
 			.defineInRange("autocannonProjectileMassFallback", 33.0D, 0.001D, 1.0E9D);
 
 	private static final ModConfigSpec.DoubleValue ROBINS_CONSTANT_MPS = BUILDER
-			.comment("ARC/Robins muzzle velocity constant, 1991 ft/s converted to m/s.")
+			.comment("Robins muzzle velocity constant, 1991 ft/s converted to m/s.")
 			.defineInRange("robinsConstantMps", 606.8568D, 1.0D, 10000.0D);
 
 	private static final ModConfigSpec.DoubleValue POWDER_CHARGE_MASS = BUILDER
@@ -43,7 +43,7 @@ public class Config {
 
 	private static final ModConfigSpec.DoubleValue AUTOCANNON_POWDER_MASS = BUILDER
 			.comment("Gunpowder mass (kg) within an autocannon cartridge.")
-			.defineInRange("autocannonPowderMassKg", 11.8153364D, 0.001D, 1.0E9D);
+			.defineInRange("autocannonPowderMass", 11.8153364D, 0.001D, 1.0E9D);
 
 	private static final ModConfigSpec.DoubleValue AUTOCANNON_CARTRIDGE_DIAMETER = BUILDER
 			.comment("Diameter (m) of an autocannon cartridge.")
