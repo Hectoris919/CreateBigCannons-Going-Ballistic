@@ -1,0 +1,22 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "org.hectoris919.CBCGoingBallistic.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "AbstractAutocannonProjectileBlockDamageMixin",
+    "AbstractCannonProjectileBlockDamageMixin",
+    "FluidShellProjectileAccessor",
+    "MortarStoneProjectileMixin",
+    "MountedAutocannonContraptionMixin",
+    "MountedCannonContraptionMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}
