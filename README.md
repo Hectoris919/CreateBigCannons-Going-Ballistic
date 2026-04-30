@@ -1,5 +1,5 @@
 <div align="center">
-  <img width="256" height="256" alt="Icon" src=".idea/icon.png" />
+  <img width="256" height="256" alt="Icon" src="icon.png" />
   <h1>Create Big Cannons: Going Ballistic</h1>
 </div>
 
