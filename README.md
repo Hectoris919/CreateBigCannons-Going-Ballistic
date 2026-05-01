@@ -3,7 +3,11 @@
   <h1>Create Big Cannons: Going Ballistic</h1>
 </div>
 
-Create Big Cannons: Going Ballistic is a mod that significantly increases the speed of Create: Big Cannons projectiles, improving the range of cannons. Create: Big Cannon's ballistics model is inaccurate, the range of a cannon scaling linearly with the amount of powder charges loaded into it, and powder charges don't seem to push the projectiles as fast as they should. This mod changes that. It does so by changing the ballistics formula used for velocity calculation to the one [Benjamin Robins developed](https://www.arc.id.au/CannonBallistics.html) in 1742:
+[![Modrinth](https://img.shields.io/modrinth/dt/xxaCKdq3?logo=modrinth&color=00AF5C)](https://modrinth.com/mod/create-big-cannons-going-ballistic)
+[![Mod Version](https://img.shields.io/modrinth/v/xxaCKdq3)](https://modrinth.com/mod/create-big-cannons-going-ballistic)
+[![MC Version](https://img.shields.io/modrinth/game-versions/xxaCKdq3?label=available%20for%20MC)](https://modrinth.com/mod/create-big-cannons-going-ballistic)
+
+Create Big Cannons: Going Ballistic is a mod that significantly increases the speed of Create: Big Cannons projectiles, improving the range of cannons. Create: Big Cannons' ballistics model is inaccurate, the range of a cannon scaling linearly with the amount of powder charges loaded into it, and powder charges don't seem to push the projectiles as fast as they should. This mod changes that. It does so by changing the ballistics formula used for velocity calculation to the one [Benjamin Robins developed](https://www.arc.id.au/CannonBallistics.html) in 1742:
 
 $$
 \begin{flalign}
@@ -22,7 +26,7 @@ $$
 
 This formula requires projectiles to have mass, so I estimated the weight of every projectile by assuming that the solid shot was entirely made of iron, calculating its volume, then basing the weight of the other projectiles off of the amount of iron items in their recipes. The machine gun round's mass looked similar to a 7.62x51mm / .308 round, just wider, so I took that round's IRL mass and increased it a bit.
 
-I based the mass of gunpowder inside a powder charge off of what's visible on the block and assumed it was a solid column of gunpowder. When a Big Cartridge is full of gunpowder (4/4), it contains 4x more gunpowder than a regular powder charge, so I based the gunpowder mass off of the cartridge's power level. The autocannon's gunpowder mass was just assumed to be the volume of a filled autocannon cartridge:
+I based the mass of gunpowder inside a powder charge off of what's visible on the block and assumed it was a solid column of gunpowder. When a Big Cartridge is full of gunpowder (Power: 4/4), it contains 4x more gunpowder than a regular powder charge, so I based the gunpowder mass off of the cartridge's power level. The autocannon's gunpowder mass was just assumed to be the volume of a filled autocannon cartridge:
 
 | Projectile | Mass |
 |-------|-----------|
