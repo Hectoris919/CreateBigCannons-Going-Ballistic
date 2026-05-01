@@ -7,11 +7,11 @@ public class Config {
 
 	private static final ModConfigSpec.BooleanValue DISABLE_REALISTIC_BALLISTICS = BUILDER
 			.comment("Disables Going Ballistic's velocity calculations.")
-			.define("disableRealisticBallistics", true);
+			.define("disableRealisticBallistics", false);
 
 	private static final ModConfigSpec.BooleanValue DISABLE_REALISTIC_BLOCK_DAMAGE = BUILDER
 			.comment("Disables Going Ballistic's impact-energy (kg/m/s) block damage calculation.")
-			.define("disableRealisticBlockDamage", true);
+			.define("disableRealisticBlockDamage", false);
 
 	private static final ModConfigSpec.BooleanValue DEBUG_BALLISTICS = BUILDER
 			.comment("Logs debug information whenever a shot is calculated.")
