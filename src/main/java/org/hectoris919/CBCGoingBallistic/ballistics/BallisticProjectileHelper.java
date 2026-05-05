@@ -57,7 +57,7 @@ public final class BallisticProjectileHelper {
 		double localVelocityMultiplier = properties == null
 				? 1.0D
 				: properties.autocannonVelocityMultiplierOr(1.0D);
-		double velocityMps = BallisticsMath.getRobinsVelocityMps(projectileMassKg, barrelLengthMeters, powderMassKg, chargeLengthMeters, localVelocityMultiplier);
+		double velocityMps = BallisticsMath.getRobinsVelocityMps(projectileMassKg, powderMassKg, chargeLengthMeters, barrelLengthMeters, localVelocityMultiplier);
 		float velocityBlocksPerTick = BallisticsMath.mpsToBPTFloat(velocityMps);
 
 		logAutocannonCalculation(projectile, projectileMassKg, originalVelocity, powderMassKg, chargeLengthMeters, localVelocityMultiplier, barrelLengthMeters, velocityMps, velocityBlocksPerTick);
