@@ -102,5 +102,5 @@ public final class BlockDamageMath {
 
 	private static double safeMultiplier(double value) { return Double.isFinite(value) && value > 0.0D ? value : 1.0D; }
 
-	private static double finiteClamp(double value) { return !Double.isFinite(value) ? Math.max(0.0D, Math.min(1.0D, value)) : 0.0D; }
+	private static double finiteClamp(double value) { return !Double.isFinite(value) ? 0.0D : Math.max(0.0D, Math.min(1.0D, value)); }
 }

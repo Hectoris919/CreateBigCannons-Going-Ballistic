@@ -28,7 +28,7 @@ public final class BallisticsMath {
 
 		double ratio = Math.max(barrelLengthMeters / chargeLengthMeters, 1.000001D);
 		double logTerm = Math.log(ratio);
-		double effectiveMassKg = projectileMassKg + powderMassKg / 3.0D;
+		double effectiveMassKg = projectileMassKg + (powderMassKg / 3.0D);
 		double radicand = (powderMassKg / effectiveMassKg) * logTerm;
 
 		if (radicand <= 0.0D || !Double.isFinite(radicand)) return 0.0D;
