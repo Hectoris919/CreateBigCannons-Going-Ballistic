@@ -13,9 +13,31 @@ public class Config {
 			.comment("Disables Going Ballistic's impact-energy (kg/m/s) block damage calculation.")
 			.define("disableRealisticBlockDamage", false);
 
+	private static final ModConfigSpec.BooleanValue DISABLE_REALISTIC_PROJECTILE_GRAVITY = BUILDER
+			.comment("Uses Earth gravity for cannon projectiles: -9.80665 m/s^2 converted to blocks/tick^2.")
+			.define("projectilePhysics.enableRealisticGravity", false);
+
+	private static final ModConfigSpec.BooleanValue DISABLE_REALISTIC_PROJECTILE_DRAG = BUILDER
+			.comment("Calculates projectile drag from NASA's drag equation instead of using CBC's static projectile drag value.")
+			.define("projectilePhysics.enableRealisticDrag", false);
+
 	private static final ModConfigSpec.BooleanValue DEBUG_BALLISTICS = BUILDER
 			.comment("Logs debug information whenever a shot is calculated.")
 			.define("debugBallistics", false);
+
+	private static final ModConfigSpec.DoubleValue AIR_DENSITY = BUILDER
+			.comment("Air density used for drag calculations, in kg/m^3. 1.225 is ISA sea-level density.")
+			.defineInRange("projectilePhysics.airDensity", 1.225D, 0.0D, 10000.0D);
+
+	private static final ModConfigSpec.DoubleValue PROJECTILE_DRAG_COEFFICIENT = BUILDER
+			.comment("Projectile drag coefficient Cd. 0.47 is a reasonable blunt/spherical default; lower values are more streamlined.")
+			.defineInRange("projectilePhysics.dragCoefficient", 0.47D, 0.0D, 10.0D);
+
+
+	private static final ModConfigSpec.DoubleValue MACHINE_GUN_BULLET_RADIUS = BUILDER
+			.comment("Machine gun bullet radius in meters. Based off of a .308 / 7.62x51 round, with its width scaled up slightly")
+			.defineInRange("projectilePhysics.machineGunBulletRadiusMeters", (0.00782D / 2.0D) * Math.cbrt(0.012D / 0.00945D), 0.000001D, 1.0D);
+
 
 	private static final ModConfigSpec.DoubleValue VELOCITY_MULTIPLIER = BUILDER
 			.comment("Global multiplier applied after the physical muzzle velocity calculation.")
@@ -65,14 +87,6 @@ public class Config {
 			.comment("Impact energy required for machine gun bullets to impart a partial block damage point on a block.")
 			.defineInRange("blockDamage.machineGunJoulesPerBlockDamagePoint", 12000.0D, 1.0D, 1.0E12D);
 
-	private static final ModConfigSpec.IntValue MAX_AUTOCANNON_BLOCK_DAMAGE = BUILDER
-			.comment("Maximum partial block damage points an autocannon hit may apply. Set to 0 to disable.")
-			.defineInRange("blockDamage.maxAutocannonBlockDamage", 0, 0, 1000000);
-
-	private static final ModConfigSpec.IntValue MAX_MACHINE_GUN_BLOCK_DAMAGE = BUILDER
-			.comment("Maximum partial block damage points a machine-gun bullet may apply. Set to 0 to disable.")
-			.defineInRange("blockDamage.maxMachineGunBlockDamage", 0, 0, 1000000);
-
 	private static final ModConfigSpec.DoubleValue MIN_HARD_TARGET_DAMAGE_FACTOR = BUILDER
 			.comment("Minimum fraction of autocannon/machine gun block damage retained after block hardness vs projectile toughness attenuation.")
 			.defineInRange("blockDamage.minHardTargetDamageFactor", 0.05D, 0.0D, 1.0D);
@@ -89,7 +103,11 @@ public class Config {
 
 	public static boolean disableRealisticBallistics() { return DISABLE_REALISTIC_BALLISTICS.get(); }
 	public static boolean disableRealisticBlockDamage() { return DISABLE_REALISTIC_BLOCK_DAMAGE.get(); }
+	public static boolean disableRealisticProjectileGravity() { return DISABLE_REALISTIC_PROJECTILE_GRAVITY.get(); }
+	public static boolean disableRealisticProjectileDrag() { return DISABLE_REALISTIC_PROJECTILE_DRAG.get(); }
 	public static boolean debugBallistics() { return DEBUG_BALLISTICS.get(); }
+	public static double airDensity() { return AIR_DENSITY.get(); }
+	public static double projectileDragCoefficient() { return PROJECTILE_DRAG_COEFFICIENT.get(); }
 	public static double velocityMultiplier() { return VELOCITY_MULTIPLIER.get(); }
 	public static double projectileMassFallback() { return PROJECTILE_MASS_FALLBACK.get(); }
 	public static double autocannonProjectileMassFallback() { return AUTOCANNON_PROJECTILE_MASS_FALLBACK.get(); }
@@ -102,8 +120,7 @@ public class Config {
 	public static double joulesPerToughnessPoint() { return JOULES_PER_TOUGHNESS_POINT.get(); }
 	public static double autocannonJoulesPerBlockDamagePoint() { return AUTOCANNON_JOULES_PER_BLOCK_DAMAGE_POINT.get(); }
 	public static double machineGunJoulesPerBlockDamagePoint() { return MACHINE_GUN_JOULES_PER_BLOCK_DAMAGE_POINT.get(); }
-	public static int maxAutocannonBlockDamage() { return MAX_AUTOCANNON_BLOCK_DAMAGE.get(); }
-	public static int maxMachineGunBlockDamage() { return MAX_MACHINE_GUN_BLOCK_DAMAGE.get(); }
+	public static double machineGunBulletRadius() { return MACHINE_GUN_BULLET_RADIUS.get(); }
 	public static double minHardTargetDamageFactor() { return MIN_HARD_TARGET_DAMAGE_FACTOR.get(); }
 	public static double apProjectileBlockDamageMultiplier() { return AP_PROJECTILE_BLOCK_DAMAGE_MULTIPLIER.get(); }
 	public static double smallArmsBlockDamageMultiplier() { return SMALL_ARMS_BLOCK_DAMAGE_MULTIPLIER.get(); }

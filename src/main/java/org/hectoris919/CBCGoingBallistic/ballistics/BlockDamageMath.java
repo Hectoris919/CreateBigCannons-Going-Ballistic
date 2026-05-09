@@ -32,12 +32,6 @@ public final class BlockDamageMath {
 				: Math.max(Config.autocannonJoulesPerBlockDamagePoint(), 1.0D);
 		double rawDamage = normalImpactEnergyJ / joulesPerPoint * safeMultiplier(constructionMultiplier);
 		int damage = (int) Math.ceil(Math.max(0.0D, rawDamage));
-		int cap = isMachineGunProjectile(projectile)
-				? Config.maxMachineGunBlockDamage()
-				: Config.maxAutocannonBlockDamage();
-
-		if (cap > 0) damage = Math.min(damage, cap);
-
 		return Math.max(damage, 0);
 	}
 

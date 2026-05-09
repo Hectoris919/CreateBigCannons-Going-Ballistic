@@ -14,7 +14,7 @@ public final class BallisticsMath {
 	 * @param projectileMassKg projectile mass m, in kg
 	 * @param powderMassKg powder mass p, in kg
 	 * @param chargeLengthMeters powder charge length c, in meters
-	 * @param barrelLengthMeters effective barrel length L, in meters
+	 * @param barrelLengthMeters effective barrel length L, in meters`
 	 * @return muzzle velocity in m/s, after config multiplier/cap
 	 */
 	public static double getRobinsVelocityMps(double projectileMassKg, double powderMassKg, double chargeLengthMeters, double barrelLengthMeters) {
