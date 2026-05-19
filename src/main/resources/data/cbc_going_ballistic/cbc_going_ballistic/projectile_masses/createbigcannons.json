@@ -42,7 +42,7 @@
     "createbigcannons:machine_gun_bullet": {
       "mass": 0.012,
       "autocannon_powder_mass": 0.0035,
-      "autocannon_charge_diameter": 0.05118,
+      "autocannon_charge_length": 0.05118,
       "autocannon_velocity_multiplier": 1.65
     }
   }

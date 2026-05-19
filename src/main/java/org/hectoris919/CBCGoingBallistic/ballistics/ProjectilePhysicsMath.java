@@ -16,7 +16,7 @@ public final class ProjectilePhysicsMath {
 	}
 
 	public static double cannonShellRadiusMeters() {
-		return BallisticsParameterRegistry.cannonChargeLengthPerChargeMeters() / 2.0D;
+		return BallisticsParameterRegistry.cannonChargeDiameter() / 2.0D;
 	}
 
 	public static double autocannonShellRadiusMeters() {

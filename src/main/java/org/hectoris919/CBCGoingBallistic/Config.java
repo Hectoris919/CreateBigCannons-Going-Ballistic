@@ -55,21 +55,33 @@ public class Config {
 			.comment("Robins muzzle velocity constant, 1991 ft/s converted to m/s.")
 			.defineInRange("robinsConstantMps", 606.8568D, 1.0D, 10000.0D);
 
-	private static final ModConfigSpec.DoubleValue POWDER_CHARGE_MASS = BUILDER
-			.comment("Gunpowder mass (kg) within a powder charge.")
-			.defineInRange("powderChargeMass", 63.0151276D, 0.001D, 1.0E9D);
+	private static final double BLACK_POWDER_DENSITY = 1700.0D;
+	private static final double PC_MASS = BLACK_POWDER_DENSITY * Math.PI * Math.pow(((2.0D/16.0D) + Math.sqrt(Math.pow(2.0D/16.0D, 2.0D) + Math.pow(2.0D/16.0D, 2.0D))) / 2.0D, 2.0D);
+	private static final double AC_MASS = BLACK_POWDER_DENSITY * Math.PI * 0.75 * Math.pow(((1.0D/16.0D) + Math.sqrt(Math.pow(1.0D/16.0D, 2.0D) + Math.pow(1.0D/16.0D, 2.0D))) / 2.0D, 2.0D);
 
 	private static final ModConfigSpec.DoubleValue POWDER_CHARGE_DIAMETER = BUILDER
 			.comment("Diameter (m) of a powder charge.")
-			.defineInRange("powderChargeDiameter", 0.16D, 0.000001D, 10000.0D);
+			.defineInRange("powderChargeDiameter", ((5.0D/16.0D) + Math.sqrt(Math.pow(5.0D/16.0D, 2.0D) + Math.pow(5.0D/16.0D, 2.0D))), 0.000001D, 10000.0D);
 
-	private static final ModConfigSpec.DoubleValue AUTOCANNON_POWDER_MASS = BUILDER
-			.comment("Gunpowder mass (kg) within an autocannon cartridge.")
-			.defineInRange("autocannonPowderMass", 11.8153364D, 0.001D, 1.0E9D);
+	private static final ModConfigSpec.DoubleValue POWDER_CHARGE_LENGTH = BUILDER
+			.comment("Length (m) of a powder charge.")
+			.defineInRange("powderChargeLength", 1.0D, 0.000001D, 10000.0D);
 
 	private static final ModConfigSpec.DoubleValue AUTOCANNON_CARTRIDGE_DIAMETER = BUILDER
 			.comment("Diameter (m) of an autocannon cartridge.")
-			.defineInRange("autocannonChargeDiameter", 0.75D, 0.000001D, 10000.0D);
+			.defineInRange("autocannonChargeDiameter", ((1.0D/16.0D) + Math.sqrt(Math.pow(1.0D/16.0D, 2.0D) + Math.pow(1.0D/16.0D, 2.0D))), 0.000001D, 10000.0D);
+
+	private static final ModConfigSpec.DoubleValue AUTOCANNON_CARTRIDGE_LENGTH = BUILDER
+			.comment("Length (m) of an autocannon cartridge.")
+			.defineInRange("autocannonChargeLength", 0.75D, 0.000001D, 10000.0D);
+
+	private static final ModConfigSpec.DoubleValue POWDER_CHARGE_MASS = BUILDER
+			.comment("Gunpowder mass (kg) within a powder charge.")
+			.defineInRange("powderChargeMass", PC_MASS, 0.001D, 1.0E9D);
+
+	private static final ModConfigSpec.DoubleValue AUTOCANNON_POWDER_MASS = BUILDER
+			.comment("Gunpowder mass (kg) within an autocannon cartridge.")
+			.defineInRange("autocannonPowderMass", AC_MASS, 0.001D, 1.0E9D);
 
 	private static final ModConfigSpec.DoubleValue BLACK_POWDER_ENERGY_J_PER_KG = BUILDER
 			.comment("Chemical energy within black powder (J/kg)")
@@ -112,10 +124,14 @@ public class Config {
 	public static double projectileMassFallback() { return PROJECTILE_MASS_FALLBACK.get(); }
 	public static double autocannonProjectileMassFallback() { return AUTOCANNON_PROJECTILE_MASS_FALLBACK.get(); }
 	public static double robinsConstantMps() { return ROBINS_CONSTANT_MPS.get(); }
+
 	public static double powderChargeMass() { return POWDER_CHARGE_MASS.get(); }
 	public static double powderChargeDiameter() { return POWDER_CHARGE_DIAMETER.get(); }
+	public static double powderChargeLength() { return POWDER_CHARGE_LENGTH.get(); }
 	public static double autocannonPowderMass() { return AUTOCANNON_POWDER_MASS.get(); }
 	public static double autocannonCartridgeDiameter() { return AUTOCANNON_CARTRIDGE_DIAMETER.get(); }
+	public static double autocannonCartridgeLength() { return AUTOCANNON_CARTRIDGE_LENGTH.get(); }
+
 	public static double blackPowderEnergyJoulesPerKg() { return BLACK_POWDER_ENERGY_J_PER_KG.get(); }
 	public static double joulesPerToughnessPoint() { return JOULES_PER_TOUGHNESS_POINT.get(); }
 	public static double autocannonJoulesPerBlockDamagePoint() { return AUTOCANNON_JOULES_PER_BLOCK_DAMAGE_POINT.get(); }

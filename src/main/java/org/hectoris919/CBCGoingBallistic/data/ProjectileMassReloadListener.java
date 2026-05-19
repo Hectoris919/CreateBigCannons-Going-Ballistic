@@ -106,7 +106,7 @@ public class ProjectileMassReloadListener extends SimpleJsonResourceReloadListen
 
 	private static Optional<ProjectileMassProperties> parseProperties(ResourceLocation fileId, ResourceLocation projectileId, JsonObject json) {
 		Double autocannonPowderMassKg = readOptionalPositive(fileId, projectileId, json, "autocannon_powder_mass");
-		Double autocannonChargeLengthMeters = readOptionalPositive(fileId, projectileId, json, "autocannon_charge_diameter");
+		Double autocannonChargeLengthMeters = readOptionalPositive(fileId, projectileId, json, "autocannon_charge_length");
 		Double autocannonVelocityMultiplier = readOptionalPositive(fileId, projectileId, json, "autocannon_velocity_multiplier");
 		Double maxSafeChargeEquivalents = readOptionalPositive(fileId, projectileId, json, "max_safe_charge_equivalents");
 

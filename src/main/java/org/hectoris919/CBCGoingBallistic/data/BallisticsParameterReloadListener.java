@@ -58,8 +58,10 @@ public class BallisticsParameterReloadListener extends SimpleJsonResourceReloadL
 		count += readPositive(json, fileId, "velocity_multiplier", builder::velocityMultiplier);
 		count += readPositive(json, fileId, "cannon_powder_mass", builder::cannonPowderMass);
 		count += readPositive(json, fileId, "cannon_charge_diameter", builder::cannonChargeDiameter);
+		count += readPositive(json, fileId, "cannon_charge_length", builder::cannonChargeLength);
 		count += readPositive(json, fileId, "autocannon_powder_mass", builder::autocannonPowderMass);
 		count += readPositive(json, fileId, "autocannon_charge_diameter", builder::autocannonCartridgeDiameter);
+		count += readPositive(json, fileId, "autocannon_charge_length", builder::autocannonCartridgeLength);
 		count += readPositive(json, fileId, "black_powder_energy_j_per_kg", builder::blackPowderEnergyJoulesPerKg);
 		return count;
 	}

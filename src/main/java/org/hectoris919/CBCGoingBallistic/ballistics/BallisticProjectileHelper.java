@@ -25,6 +25,10 @@ public final class BallisticProjectileHelper {
 	private static final int MAX_BARREL_SCAN_BLOCKS = 512;
 	private static final double DEFAULT_FLUID_CONTAINER_CAPACITY_MB = 2000.0D;
 
+	private static final double DRY_BORE_SLIDING_SHEAR_STRESS_PA = 1000000.0D;
+	private static final double DRY_BORE_SHOT_START_SHEAR_STRESS_PA = 10000000.0D;
+	private static final double SHOT_START_TRAVEL_METERS = 0.02D;
+
 	private BallisticProjectileHelper() { }
 
 	public static float calculateCannonLaunchVelocityBlocksPerTick(Entity projectile, float cbcChargePower, AbstractMountedCannonContraption contraption) {
@@ -52,8 +56,8 @@ public final class BallisticProjectileHelper {
 				? BallisticsParameterRegistry.autocannonPowderMass()
 				: properties.autocannonPowderMassKgOr(BallisticsParameterRegistry.autocannonPowderMass());
 		double chargeLengthMeters = properties == null
-				? BallisticsParameterRegistry.autocannonCartridgeDiameter()
-				: properties.autocannonChargeLengthMetersOr(BallisticsParameterRegistry.autocannonCartridgeDiameter());
+				? BallisticsParameterRegistry.autocannonCartridgeLength()
+				: properties.autocannonChargeLengthMetersOr(BallisticsParameterRegistry.autocannonCartridgeLength());
 		double localVelocityMultiplier = properties == null
 				? 1.0D
 				: properties.autocannonVelocityMultiplierOr(1.0D);
@@ -67,23 +71,30 @@ public final class BallisticProjectileHelper {
 				: originalVelocity;
 	}
 
-	public static float calculateCannonJammingVelocityBlocksPerTick(Entity projectile, float cbcChargePower, int barrelTravelled) {
-		if (Config.disableRealisticBallistics()) return cbcChargePower;
-		if (projectile == null || barrelTravelled < 1) return cbcChargePower;
+	public static boolean wouldCannonSquib(Entity projectile, float cbcChargePower, int barrelTravelled) {
+		if (Config.disableRealisticBallistics()) return false;
+		if (projectile == null) return false;
 
 		double projectileMassKg = getProjectileMassKg(projectile);
-		double travelledMeters = Math.max(barrelTravelled, MIN_BARREL_LENGTH_METERS);
-		double velocityMps = BallisticsMath.getCannonVelocityFromChargePowerMps(projectileMassKg, cbcChargePower, travelledMeters);
-		float velocityBlocksPerTick = BallisticsMath.mpsToBPTFloat(velocityMps);
+		double chargeEquivalent = cbcChargePower / 2.0D;
+		double powderMassKg = chargeEquivalent * BallisticsParameterRegistry.cannonPowderMass();
+		double chargeLengthMeters = chargeEquivalent * BallisticsParameterRegistry.cannonChargeLength();
 
-		logCannonCalculation("squib-check", projectile, projectileMassKg, cbcChargePower, travelledMeters, velocityMps, velocityBlocksPerTick);
+		double projectileTravelMeters = Math.max(barrelTravelled, 0.0D);
+		double finalGasColumnLengthMeters = chargeLengthMeters + projectileTravelMeters;
+		double idealVelocityMps = BallisticsMath.getRobinsVelocityMps(projectileMassKg, powderMassKg, chargeLengthMeters, finalGasColumnLengthMeters);
+		double idealProjectileEnergyJ = kineticEnergyJ(projectileMassKg, idealVelocityMps);
 
-		return velocityBlocksPerTick > 0.0F
-				? velocityBlocksPerTick
-				: cbcChargePower;
+		double projectileDiameterMeters = BallisticsParameterRegistry.cannonChargeDiameter();
+		double bearingAreaM2 = Math.PI * projectileDiameterMeters;
+		double slidingWorkJ = DRY_BORE_SLIDING_SHEAR_STRESS_PA * bearingAreaM2 * projectileTravelMeters;
+		double shotStartWorkJ = DRY_BORE_SHOT_START_SHEAR_STRESS_PA * bearingAreaM2 * SHOT_START_TRAVEL_METERS;
+		double requiredWorkJ = slidingWorkJ + shotStartWorkJ;
+
+		boolean squib = idealProjectileEnergyJ <= requiredWorkJ;
+		logCannonSquibCalculation(projectile, projectileMassKg, cbcChargePower, projectileTravelMeters, finalGasColumnLengthMeters, BallisticsParameterRegistry.cannonChargeDiameter(), idealVelocityMps, idealProjectileEnergyJ, slidingWorkJ, shotStartWorkJ, requiredWorkJ, squib);
+		return squib;
 	}
-
-	public static double getProjectileMassKg(Entity projectile) { return getProjectileMassKg(projectile, Config.projectileMassFallback()); }
 
 	public static ProjectileMassProperties getProjectileMassProperties(Entity projectile) {
 		ResourceLocation projectileId = getProjectileId(projectile);
@@ -91,6 +102,13 @@ public final class BallisticProjectileHelper {
 		return ProjectileMassRegistry.getProperties(projectileId).orElse(null);
 	}
 
+	private static double kineticEnergyJ(double massKg, double velocityMps) {
+		if (!Double.isFinite(massKg) || !Double.isFinite(velocityMps)) return 0.0D;
+		if (massKg <= 0.0D || velocityMps <= 0.0D) return 0.0D;
+		return 0.5D * massKg * velocityMps * velocityMps;
+	}
+
+	public static double getProjectileMassKg(Entity projectile) { return getProjectileMassKg(projectile, Config.projectileMassFallback()); }
 	public static double getProjectileMassKg(Entity projectile, double fallbackMassKg) {
 		if (projectile == null) return fallbackMassKg;
 
@@ -202,7 +220,7 @@ public final class BallisticProjectileHelper {
 
 		double chargeEquivalent = cbcChargePower / 2.0D;
 		double powderMassKg = chargeEquivalent * BallisticsParameterRegistry.cannonPowderMass();
-		double chargeLengthMeters = chargeEquivalent * BallisticsParameterRegistry.cannonChargeLengthPerChargeMeters();
+		double chargeLengthMeters = chargeEquivalent * BallisticsParameterRegistry.cannonChargeLength();
 
 		GoingBallistic.LOGGER.info(
 				"[Going Ballistic] Cannon {}: projectile={}, mass={} kg, chargePower={}, chargeEquivalent={}, powderMass={} kg, chargeLength={} m, barrelLength={} m, velocity={} m/s, velocity={} blocks/tick",
@@ -232,6 +250,33 @@ public final class BallisticProjectileHelper {
 				barrelLengthMeters,
 				velocityMps,
 				velocityBlocksPerTick
+		);
+	}
+
+	private static void logCannonSquibCalculation(Entity projectile, double projectileMassKg, float cbcChargePower, double travelledMeters, double finalGasColumnLengthMeters, double projectileDiameterMeters, double idealVelocityMps, double idealProjectileEnergyJ, double slidingWorkJ, double shotStartWorkJ, double requiredWorkJ, boolean squib) {
+		if (!Config.debugBallistics()) return;
+
+		double chargeEquivalent = cbcChargePower / 2.0D;
+		double powderMassKg = chargeEquivalent * BallisticsParameterRegistry.cannonPowderMass();
+		double chargeLengthMeters = chargeEquivalent * BallisticsParameterRegistry.cannonChargeLength();
+
+		GoingBallistic.LOGGER.info(
+				"[Going Ballistic] Cannon squib check: projectile={}, mass={} kg, chargePower={}, chargeEquivalent={}, powderMass={} kg, chargeLength={} m, travelled={} m, finalGasColumnLength={} m, projectileDiameter={} m, idealVelocity={} m/s, idealEnergy={} J, slidingWork={} J, shotStartWork={} J, requiredWork={} J, squib={}",
+				getProjectileId(projectile),
+				projectileMassKg,
+				cbcChargePower,
+				chargeEquivalent,
+				powderMassKg,
+				chargeLengthMeters,
+				travelledMeters,
+				finalGasColumnLengthMeters,
+				projectileDiameterMeters,
+				idealVelocityMps,
+				idealProjectileEnergyJ,
+				slidingWorkJ,
+				shotStartWorkJ,
+				requiredWorkJ,
+				squib
 		);
 	}
 

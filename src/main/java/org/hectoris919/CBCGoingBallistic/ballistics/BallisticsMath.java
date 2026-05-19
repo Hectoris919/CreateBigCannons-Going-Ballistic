@@ -41,7 +41,7 @@ public final class BallisticsMath {
 		if (!Double.isFinite(powderCharges) || powderCharges <= 0.0D) return 0.0D;
 
 		double powderMassKg = powderCharges * BallisticsParameterRegistry.cannonPowderMass();
-		double chargeLengthMeters = powderCharges * BallisticsParameterRegistry.cannonChargeLengthPerChargeMeters();
+		double chargeLengthMeters = powderCharges * BallisticsParameterRegistry.cannonChargeLength();
 
 		return getRobinsVelocityMps(projectileMassKg, powderMassKg, chargeLengthMeters, barrelLengthMeters);
 	}

@@ -1,5 +1,6 @@
 package org.hectoris919.CBCGoingBallistic.mixin;
 
+import org.hectoris919.CBCGoingBallistic.Config;
 import org.hectoris919.CBCGoingBallistic.ballistics.BallisticProjectileHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -23,8 +24,9 @@ public abstract class MountedCannonContraptionMixin {
 			)
 	)
 	private boolean goingballistic$getProjectileForJammingCheck(AbstractBigCannonProjectile projectile) {
-		this.goingballistic$currentProjectile = projectile;
-		return projectile.canSquib();
+		boolean canSquib = projectile.canSquib();
+		this.goingballistic$currentProjectile = canSquib ? projectile : null;
+		return canSquib;
 	}
 
 	@Redirect(
@@ -34,16 +36,15 @@ public abstract class MountedCannonContraptionMixin {
 					target = "Lrbasamoyai/createbigcannons/cannons/big_cannons/material/BigCannonMaterialProperties;mayGetStuck(FI)Z"
 			)
 	)
-	private boolean goingballistic$useVelocityForJammingCheck(BigCannonMaterialProperties properties, float chargesUsed, int barrelTravelled) {
+	private boolean goingballistic$useDryBoreSquibCheck(BigCannonMaterialProperties properties, float chargesUsed, int barrelTravelled) {
 		AbstractBigCannonProjectile projectile = this.goingballistic$currentProjectile;
 		this.goingballistic$currentProjectile = null;
 
-		float effectiveVelocity = BallisticProjectileHelper.calculateCannonJammingVelocityBlocksPerTick(
-				projectile,
-				chargesUsed,
-				barrelTravelled
-		);
-		return properties.mayGetStuck(effectiveVelocity, barrelTravelled);
+		if (Config.disableRealisticBallistics() || projectile == null) {
+			return properties.mayGetStuck(chargesUsed, barrelTravelled);
+		}
+
+		return BallisticProjectileHelper.wouldCannonSquib(projectile, chargesUsed, barrelTravelled);
 	}
 
 	@Redirect(
