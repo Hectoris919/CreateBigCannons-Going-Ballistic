@@ -4,6 +4,7 @@
 </div>
 
 [![Modrinth](https://img.shields.io/modrinth/dt/xxaCKdq3?logo=modrinth&color=00AF5C)](https://modrinth.com/mod/create-big-cannons-going-ballistic)
+[![Curse Forge](https://img.shields.io/curseforge/dt/1541510?logo=curseforge&color=F16436)](https://www.curseforge.com/minecraft/mc-mods/create-big-cannons-going-ballistic)
 [![Mod Version](https://img.shields.io/modrinth/v/xxaCKdq3)](https://modrinth.com/mod/create-big-cannons-going-ballistic)
 [![MC Version](https://img.shields.io/modrinth/game-versions/xxaCKdq3?label=available%20for%20MC)](https://modrinth.com/mod/create-big-cannons-going-ballistic)
 
