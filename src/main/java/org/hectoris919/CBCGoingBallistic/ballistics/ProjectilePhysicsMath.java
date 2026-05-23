@@ -2,7 +2,6 @@ package org.hectoris919.CBCGoingBallistic.ballistics;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
-import org.hectoris919.CBCGoingBallistic.Config;
 import org.hectoris919.CBCGoingBallistic.data.BallisticsParameterRegistry;
 
 public final class ProjectilePhysicsMath {
@@ -30,7 +29,7 @@ public final class ProjectilePhysicsMath {
 
 		String path = projectileId.getPath();
 
-		if ("machine_gun_bullet".equals(path)) return Config.machineGunBulletRadius();
+		if ("machine_gun_bullet".equals(path)) return BallisticsParameterRegistry.machineGunBulletRadius();
 		if (path.contains("autocannon")) return autocannonShellRadiusMeters();
 
 		return cannonShellRadiusMeters();

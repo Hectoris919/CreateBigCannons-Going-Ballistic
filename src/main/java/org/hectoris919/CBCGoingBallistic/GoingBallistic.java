@@ -8,7 +8,10 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import org.hectoris919.CBCGoingBallistic.data.BallisticsParameterReloadListener;
+import org.hectoris919.CBCGoingBallistic.data.CannonComponentReloadListener;
+import org.hectoris919.CBCGoingBallistic.data.ItemProjectileReloadListener;
 import org.hectoris919.CBCGoingBallistic.data.ProjectileMassReloadListener;
+import org.hectoris919.CBCGoingBallistic.data.PropellantReloadListener;
 import org.slf4j.Logger;
 
 @Mod(GoingBallistic.MODID)
@@ -20,6 +23,9 @@ public class GoingBallistic {
 		modEventBus.addListener(this::commonSetup);
 		NeoForge.EVENT_BUS.addListener(ProjectileMassReloadListener::onAddReloadListeners);
 		NeoForge.EVENT_BUS.addListener(BallisticsParameterReloadListener::onAddReloadListeners);
+		NeoForge.EVENT_BUS.addListener(ItemProjectileReloadListener::onAddReloadListeners);
+		NeoForge.EVENT_BUS.addListener(PropellantReloadListener::onAddReloadListeners);
+		NeoForge.EVENT_BUS.addListener(CannonComponentReloadListener::onAddReloadListeners);
 		modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
 	}
 

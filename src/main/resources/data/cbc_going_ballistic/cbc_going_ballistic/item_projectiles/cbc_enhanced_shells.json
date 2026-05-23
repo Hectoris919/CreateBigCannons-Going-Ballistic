@@ -1,0 +1,111 @@
+{
+  "values": {
+    "cbc_enhanced_shells:solid_shot_mk1": "cbc_enhanced_shells:solid_shot_mk1",
+    "cbc_enhanced_shells:solid_shot_mk2": "cbc_enhanced_shells:solid_shot_mk2",
+    "cbc_enhanced_shells:solid_shot_mk3": "cbc_enhanced_shells:solid_shot_mk3",
+    "cbc_enhanced_shells:solid_shot_mk4": "cbc_enhanced_shells:solid_shot_mk4",
+    "cbc_enhanced_shells:solid_shot_mk5": "cbc_enhanced_shells:solid_shot_mk5",
+
+    "cbc_enhanced_shells:ap_shot_mk1": "cbc_enhanced_shells:ap_shot_mk1",
+    "cbc_enhanced_shells:ap_shot_mk2": "cbc_enhanced_shells:ap_shot_mk2",
+    "cbc_enhanced_shells:ap_shot_mk3": "cbc_enhanced_shells:ap_shot_mk3",
+    "cbc_enhanced_shells:ap_shot_mk4": "cbc_enhanced_shells:ap_shot_mk4",
+    "cbc_enhanced_shells:ap_shot_mk5": "cbc_enhanced_shells:ap_shot_mk5",
+
+    "cbc_enhanced_shells:mortar_shot_mk1": "cbc_enhanced_shells:mortar_shot_mk1",
+    "cbc_enhanced_shells:mortar_shot_mk2": "cbc_enhanced_shells:mortar_shot_mk2",
+    "cbc_enhanced_shells:mortar_shot_mk3": "cbc_enhanced_shells:mortar_shot_mk3",
+    "cbc_enhanced_shells:mortar_shot_mk4": "cbc_enhanced_shells:mortar_shot_mk4",
+    "cbc_enhanced_shells:mortar_shot_mk5": "cbc_enhanced_shells:mortar_shot_mk5",
+
+    "cbc_enhanced_shells:bag_of_grapeshot_mk1": "cbc_enhanced_shells:bag_of_grapeshot_mk1",
+    "cbc_enhanced_shells:bag_of_grapeshot_mk2": "cbc_enhanced_shells:bag_of_grapeshot_mk2",
+    "cbc_enhanced_shells:bag_of_grapeshot_mk3": "cbc_enhanced_shells:bag_of_grapeshot_mk3",
+    "cbc_enhanced_shells:bag_of_grapeshot_mk4": "cbc_enhanced_shells:bag_of_grapeshot_mk4",
+    "cbc_enhanced_shells:bag_of_grapeshot_mk5": "cbc_enhanced_shells:bag_of_grapeshot_mk5",
+
+    "cbc_enhanced_shells:he_shot_mk1": "cbc_enhanced_shells:he_shot_mk1",
+    "cbc_enhanced_shells:he_shot_mk2": "cbc_enhanced_shells:he_shot_mk2",
+    "cbc_enhanced_shells:he_shot_mk3": "cbc_enhanced_shells:he_shot_mk3",
+    "cbc_enhanced_shells:he_shot_mk4": "cbc_enhanced_shells:he_shot_mk4",
+    "cbc_enhanced_shells:he_shot_mk5": "cbc_enhanced_shells:he_shot_mk5",
+
+    "cbc_enhanced_shells:ap_shell_mk1": "cbc_enhanced_shells:ap_shell_mk1",
+    "cbc_enhanced_shells:ap_shell_mk2": "cbc_enhanced_shells:ap_shell_mk2",
+    "cbc_enhanced_shells:ap_shell_mk3": "cbc_enhanced_shells:ap_shell_mk3",
+    "cbc_enhanced_shells:ap_shell_mk4": "cbc_enhanced_shells:ap_shell_mk4",
+    "cbc_enhanced_shells:ap_shell_mk5": "cbc_enhanced_shells:ap_shell_mk5",
+
+    "cbc_enhanced_shells:shrapnel_shell_mk1": "cbc_enhanced_shells:shrapnel_shell_mk1",
+    "cbc_enhanced_shells:shrapnel_shell_mk2": "cbc_enhanced_shells:shrapnel_shell_mk2",
+    "cbc_enhanced_shells:shrapnel_shell_mk3": "cbc_enhanced_shells:shrapnel_shell_mk3",
+    "cbc_enhanced_shells:shrapnel_shell_mk4": "cbc_enhanced_shells:shrapnel_shell_mk4",
+    "cbc_enhanced_shells:shrapnel_shell_mk5": "cbc_enhanced_shells:shrapnel_shell_mk5",
+
+    "cbc_enhanced_shells:drop_mortar_mk1": "cbc_enhanced_shells:drop_mortar_shell_mk1",
+    "cbc_enhanced_shells:drop_mortar_mk2": "cbc_enhanced_shells:drop_mortar_shell_mk2",
+    "cbc_enhanced_shells:drop_mortar_mk3": "cbc_enhanced_shells:drop_mortar_shell_mk3",
+    "cbc_enhanced_shells:drop_mortar_mk4": "cbc_enhanced_shells:drop_mortar_shell_mk4",
+    "cbc_enhanced_shells:drop_mortar_mk5": "cbc_enhanced_shells:drop_mortar_shell_mk5",
+
+    "cbc_enhanced_shells:smoke_shell_mk1": "cbc_enhanced_shells:smoke_shell_mk1",
+    "cbc_enhanced_shells:smoke_shell_mk2": "cbc_enhanced_shells:smoke_shell_mk2",
+    "cbc_enhanced_shells:smoke_shell_mk3": "cbc_enhanced_shells:smoke_shell_mk3",
+    "cbc_enhanced_shells:smoke_shell_mk4": "cbc_enhanced_shells:smoke_shell_mk4",
+    "cbc_enhanced_shells:smoke_shell_mk5": "cbc_enhanced_shells:smoke_shell_mk5",
+
+    "cbc_enhanced_shells:shell_holder_mk1": "cbc_enhanced_shells:shell_holder_mk1",
+    "cbc_enhanced_shells:shell_holder_mk2": "cbc_enhanced_shells:shell_holder_mk2",
+    "cbc_enhanced_shells:shell_holder_mk3": "cbc_enhanced_shells:shell_holder_mk3",
+    "cbc_enhanced_shells:shell_holder_mk4": "cbc_enhanced_shells:shell_holder_mk4",
+    "cbc_enhanced_shells:shell_holder_mk5": "cbc_enhanced_shells:shell_holder_mk5",
+
+    "cbc_enhanced_shells:plasma_shell_mk1": "cbc_enhanced_shells:plasma_shell_mk1",
+    "cbc_enhanced_shells:plasma_shell_mk2": "cbc_enhanced_shells:plasma_shell_mk2",
+    "cbc_enhanced_shells:plasma_shell_mk3": "cbc_enhanced_shells:plasma_shell_mk3",
+    "cbc_enhanced_shells:plasma_shell_mk4": "cbc_enhanced_shells:plasma_shell_mk4",
+    "cbc_enhanced_shells:plasma_shell_mk5": "cbc_enhanced_shells:plasma_shell_mk5",
+
+    "cbc_enhanced_shells:gravitational_shell_mk1": "cbc_enhanced_shells:gravitational_shell_mk1",
+    "cbc_enhanced_shells:gravitational_shell_mk2": "cbc_enhanced_shells:gravitational_shell_mk2",
+    "cbc_enhanced_shells:gravitational_shell_mk3": "cbc_enhanced_shells:gravitational_shell_mk3",
+    "cbc_enhanced_shells:gravitational_shell_mk4": "cbc_enhanced_shells:gravitational_shell_mk4",
+    "cbc_enhanced_shells:gravitational_shell_mk5": "cbc_enhanced_shells:gravitational_shell_mk5",
+
+    "cbc_enhanced_shells:vortex_shell_mk1": "cbc_enhanced_shells:vortex_shell_mk1",
+    "cbc_enhanced_shells:vortex_shell_mk2": "cbc_enhanced_shells:vortex_shell_mk2",
+    "cbc_enhanced_shells:vortex_shell_mk3": "cbc_enhanced_shells:vortex_shell_mk3",
+    "cbc_enhanced_shells:vortex_shell_mk4": "cbc_enhanced_shells:vortex_shell_mk4",
+    "cbc_enhanced_shells:vortex_shell_mk5": "cbc_enhanced_shells:vortex_shell_mk5",
+
+    "cbc_enhanced_shells:disintegration_shell_mk1": "cbc_enhanced_shells:disintegration_shell_mk1",
+    "cbc_enhanced_shells:disintegration_shell_mk2": "cbc_enhanced_shells:disintegration_shell_mk2",
+    "cbc_enhanced_shells:disintegration_shell_mk3": "cbc_enhanced_shells:disintegration_shell_mk3",
+    "cbc_enhanced_shells:disintegration_shell_mk4": "cbc_enhanced_shells:disintegration_shell_mk4",
+    "cbc_enhanced_shells:disintegration_shell_mk5": "cbc_enhanced_shells:disintegration_shell_mk5",
+
+    "cbc_enhanced_shells:singularity_shell_mk1": "cbc_enhanced_shells:singularity_shell_mk1",
+    "cbc_enhanced_shells:singularity_shell_mk2": "cbc_enhanced_shells:singularity_shell_mk2",
+    "cbc_enhanced_shells:singularity_shell_mk3": "cbc_enhanced_shells:singularity_shell_mk3",
+    "cbc_enhanced_shells:singularity_shell_mk4": "cbc_enhanced_shells:singularity_shell_mk4",
+    "cbc_enhanced_shells:singularity_shell_mk5": "cbc_enhanced_shells:singularity_shell_mk5",
+
+    "cbc_enhanced_shells:nuke_shell": "cbc_enhanced_shells:nuke_shell",
+    "cbc_enhanced_shells:nuke_shell_mk2": "cbc_enhanced_shells:nuke_shell_mk2",
+
+    "cbc_enhanced_shells:h_bomb_shell": "cbc_enhanced_shells:h_bomb_shell",
+    "cbc_enhanced_shells:h_bomb_mini_shell": "cbc_enhanced_shells:h_bomb_mini_shell",
+
+    "cbc_enhanced_shells:cluster_shell_mk1": "cbc_enhanced_shells:cluster_shell_mk1",
+    "cbc_enhanced_shells:cluster_shell_mk2": "cbc_enhanced_shells:cluster_shell_mk2",
+    "cbc_enhanced_shells:cluster_shell_mk3": "cbc_enhanced_shells:cluster_shell_mk3",
+    "cbc_enhanced_shells:cluster_shell_mk4": "cbc_enhanced_shells:cluster_shell_mk4",
+    "cbc_enhanced_shells:cluster_shell_mk5": "cbc_enhanced_shells:cluster_shell_mk5",
+
+    "cbc_enhanced_shells:bunker_buster_shell_mk1": "cbc_enhanced_shells:bunker_buster_shell_mk1",
+    "cbc_enhanced_shells:bunker_buster_shell_mk2": "cbc_enhanced_shells:bunker_buster_shell_mk2",
+    "cbc_enhanced_shells:bunker_buster_shell_mk3": "cbc_enhanced_shells:bunker_buster_shell_mk3",
+    "cbc_enhanced_shells:bunker_buster_shell_mk4": "cbc_enhanced_shells:bunker_buster_shell_mk4",
+    "cbc_enhanced_shells:bunker_buster_shell_mk5": "cbc_enhanced_shells:bunker_buster_shell_mk5"
+  }
+}

@@ -1,0 +1,188 @@
+{
+  "values": {
+    "cbc_at:cluster_cartridge": {
+      "type": "powder_charge",
+      "charge_equivalents": 1.0,
+      "velocity_multiplier": 1.08
+    },
+    "cbc_at:cluster_caseless": {
+      "type": "powder_charge",
+      "charge_equivalents": 1.5,
+      "case_mass": 0.0
+    },
+
+    "cbc_at:solid_shot_cartridge": {
+      "type": "powder_charge",
+      "charge_equivalents": 1.0,
+      "velocity_multiplier": 1.08
+    },
+    "cbc_at:solid_shot_caseless": {
+      "type": "powder_charge",
+      "charge_equivalents": 1.5,
+      "case_mass": 0.0
+    },
+    "cbc_at:armor_piercing_cartridge": {
+      "type": "powder_charge",
+      "charge_equivalents": 1.0,
+      "velocity_multiplier": 1.08
+    },
+    "cbc_at:armor_piercing_caseless": {
+      "type": "powder_charge",
+      "charge_equivalents": 1.5,
+      "case_mass": 0.0
+    },
+    "cbc_at:armor_piercing_shell_cartridge": {
+      "type": "powder_charge",
+      "charge_equivalents": 1.0,
+      "velocity_multiplier": 1.08
+    },
+    "cbc_at:armor_piercing_shell_caseless": {
+      "type": "powder_charge",
+      "charge_equivalents": 1.5,
+      "case_mass": 0.0
+    },
+    "cbc_at:grapeshot_cartridge": {
+      "type": "powder_charge",
+      "charge_equivalents": 1.0,
+      "velocity_multiplier": 1.08
+    },
+    "cbc_at:grapeshot_caseless": {
+      "type": "powder_charge",
+      "charge_equivalents": 1.5,
+      "case_mass": 0.0
+    },
+    "cbc_at:high_explosive_cartridge": {
+      "type": "powder_charge",
+      "charge_equivalents": 1.0,
+      "velocity_multiplier": 1.08
+    },
+    "cbc_at:high_explosive_caseless": {
+      "type": "powder_charge",
+      "charge_equivalents": 1.5,
+      "case_mass": 0.0
+    },
+    "cbc_at:shrapnel_cartridge": {
+      "type": "powder_charge",
+      "charge_equivalents": 1.0,
+      "velocity_multiplier": 1.08
+    },
+    "cbc_at:shrapnel_caseless": {
+      "type": "powder_charge",
+      "charge_equivalents": 1.5,
+      "case_mass": 0.0
+    },
+    "cbc_at:fluid_shell_cartridge": {
+      "type": "powder_charge",
+      "charge_equivalents": 1.0,
+      "velocity_multiplier": 1.08
+    },
+    "cbc_at:fluid_shell_caseless": {
+      "type": "powder_charge",
+      "charge_equivalents": 1.5,
+      "case_mass": 0.0
+    },
+    "cbc_at:smoke_cartridge": {
+      "type": "powder_charge",
+      "charge_equivalents": 1.0,
+      "velocity_multiplier": 1.08
+    },
+    "cbc_at:smoke_caseless": {
+      "type": "powder_charge",
+      "charge_equivalents": 1.5,
+      "case_mass": 0.0
+    },
+
+    "cbc_at:heavy_autocannon_cartridge{components:{\"createbigcannons:projectile\":[{item:{count:1,id:\"cbc_at:ha_ap_item\"}],\"cbc_at:ha_strong_round\":0b}}}": {
+      "type": "autocannon_cartridge",
+      "autocannon_powder_mass": 76.0,
+      "autocannon_charge_length": 0.625,
+      "autocannon_charge_diameter": 0.301776695297
+    },
+    "cbc_at:heavy_autocannon_cartridge{components:{\"createbigcannons:projectile\":[{item:{count:1,id:\"cbc_at:ha_apds_item\"}],\"cbc_at:ha_strong_round\":0b}}}": {
+      "type": "autocannon_cartridge",
+      "autocannon_powder_mass": 76.0,
+      "autocannon_charge_length": 0.625,
+      "autocannon_charge_diameter": 0.301776695297
+    },
+    "cbc_at:heavy_autocannon_cartridge{components:{\"createbigcannons:projectile\":[{item:{count:1,id:\"cbc_at:ha_apdsfs_item\"}],\"cbc_at:ha_strong_round\":0b}}}": {
+      "type": "autocannon_cartridge",
+      "autocannon_powder_mass": 76.0,
+      "autocannon_charge_length": 0.625,
+      "autocannon_charge_diameter": 0.301776695297
+    },
+    "cbc_at:heavy_autocannon_cartridge{components:{\"createbigcannons:projectile\":[{item:{count:1,id:\"cbc_at:ha_he_item\"}],\"cbc_at:ha_strong_round\":0b}}}": {
+      "type": "autocannon_cartridge",
+      "autocannon_powder_mass": 76.0,
+      "autocannon_charge_length": 0.625,
+      "autocannon_charge_diameter": 0.301776695297
+    },
+    "cbc_at:heavy_autocannon_cartridge{components:{\"createbigcannons:projectile\":[{item:{count:1,id:\"cbc_at:ha_hef_item\"}],\"cbc_at:ha_strong_round\":0b}}}": {
+      "type": "autocannon_cartridge",
+      "autocannon_powder_mass": 76.0,
+      "autocannon_charge_length": 0.625,
+      "autocannon_charge_diameter": 0.301776695297
+    },
+    "cbc_at:heavy_autocannon_cartridge{components:{\"createbigcannons:projectile\":[{item:{count:1,id:\"cbc_at:ha_heat_item\"}],\"cbc_at:ha_strong_round\":0b}}}": {
+      "type": "autocannon_cartridge",
+      "autocannon_powder_mass": 76.0,
+      "autocannon_charge_length": 0.625,
+      "autocannon_charge_diameter": 0.301776695297
+    },
+    "cbc_at:heavy_autocannon_cartridge{components:{\"createbigcannons:projectile\":[{item:{count:1,id:\"cbc_at:ha_smoke_item\"}],\"cbc_at:ha_strong_round\":0b}}}": {
+      "type": "autocannon_cartridge",
+      "autocannon_powder_mass": 76.0,
+      "autocannon_charge_length": 0.625,
+      "autocannon_charge_diameter": 0.301776695297
+    },
+
+    "cbc_at:heavy_autocannon_cartridge{components:{\"createbigcannons:projectile\":[{item:{count:1,id:\"cbc_at:ha_ap_item\"}],\"cbc_at:ha_strong_round\":1b}}}": {
+      "type": "autocannon_cartridge",
+      "autocannon_powder_mass": 71.5,
+      "autocannon_charge_length": 0.625,
+      "autocannon_charge_diameter": 0.301776695297,
+      "velocity_multiplier": 1.11
+    },
+    "cbc_at:heavy_autocannon_cartridge{components:{\"createbigcannons:projectile\":[{item:{count:1,id:\"cbc_at:ha_apds_item\"}],\"cbc_at:ha_strong_round\":1b}}}": {
+      "type": "autocannon_cartridge",
+      "autocannon_powder_mass": 71.5,
+      "autocannon_charge_length": 0.625,
+      "autocannon_charge_diameter": 0.301776695297,
+      "velocity_multiplier": 1.11
+    },
+    "cbc_at:heavy_autocannon_cartridge{components:{\"createbigcannons:projectile\":[{item:{count:1,id:\"cbc_at:ha_apdsfs_item\"}],\"cbc_at:ha_strong_round\":1b}}}": {
+      "type": "autocannon_cartridge",
+      "autocannon_powder_mass": 71.5,
+      "autocannon_charge_length": 0.625,
+      "autocannon_charge_diameter": 0.301776695297,
+      "velocity_multiplier": 1.11
+    },
+    "cbc_at:heavy_autocannon_cartridge{components:{\"createbigcannons:projectile\":[{item:{count:1,id:\"cbc_at:ha_he_item\"}],\"cbc_at:ha_strong_round\":1b}}}": {
+      "type": "autocannon_cartridge",
+      "autocannon_powder_mass": 71.5,
+      "autocannon_charge_length": 0.625,
+      "autocannon_charge_diameter": 0.301776695297,
+      "velocity_multiplier": 1.11
+    },
+    "cbc_at:heavy_autocannon_cartridge{components:{\"createbigcannons:projectile\":[{item:{count:1,id:\"cbc_at:ha_hef_item\"}],\"cbc_at:ha_strong_round\":1b}}}": {
+      "type": "autocannon_cartridge",
+      "autocannon_powder_mass": 71.5,
+      "autocannon_charge_length": 0.625,
+      "autocannon_charge_diameter": 0.301776695297,
+      "velocity_multiplier": 1.11
+    },
+    "cbc_at:heavy_autocannon_cartridge{components:{\"createbigcannons:projectile\":[{item:{count:1,id:\"cbc_at:ha_heat_item\"}],\"cbc_at:ha_strong_round\":1b}}}": {
+      "type": "autocannon_cartridge",
+      "autocannon_powder_mass": 71.5,
+      "autocannon_charge_length": 0.625,
+      "autocannon_charge_diameter": 0.301776695297,
+      "velocity_multiplier": 1.11
+    },
+    "cbc_at:heavy_autocannon_cartridge{components:{\"createbigcannons:projectile\":[{item:{count:1,id:\"cbc_at:ha_smoke_item\"}],\"cbc_at:ha_strong_round\":1b}}}": {
+      "type": "autocannon_cartridge",
+      "autocannon_powder_mass": 71.5,
+      "autocannon_charge_length": 0.625,
+      "autocannon_charge_diameter": 0.301776695297,
+      "velocity_multiplier": 1.11
+    }
+  }
+}

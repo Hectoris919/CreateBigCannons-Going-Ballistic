@@ -1,0 +1,398 @@
+{
+  "values": {
+    "cbc_enhanced_shells:solid_shot_mk1": {
+      "copy": "createbigcannons:shot",
+      "mass_multiplier": 1.1
+    },
+    "cbc_enhanced_shells:solid_shot_mk2": {
+      "copy": "createbigcannons:shot",
+      "mass_multiplier": 1.2
+    },
+    "cbc_enhanced_shells:solid_shot_mk3": {
+      "copy": "createbigcannons:shot",
+      "mass_multiplier": 1.3
+    },
+    "cbc_enhanced_shells:solid_shot_mk4": {
+      "copy": "createbigcannons:shot",
+      "mass_multiplier": 1.4
+    },
+    "cbc_enhanced_shells:solid_shot_mk5": {
+      "copy": "createbigcannons:shot",
+      "mass_multiplier": 1.5
+    },
+
+    "cbc_enhanced_shells:ap_shot_mk1": {
+      "copy": "createbigcannons:ap_shot",
+      "mass_multiplier": 1.1
+    },
+    "cbc_enhanced_shells:ap_shot_mk2": {
+      "copy": "createbigcannons:ap_shot",
+      "mass_multiplier": 1.2
+    },
+    "cbc_enhanced_shells:ap_shot_mk3": {
+      "copy": "createbigcannons:ap_shot",
+      "mass_multiplier": 1.3
+    },
+    "cbc_enhanced_shells:ap_shot_mk4": {
+      "copy": "createbigcannons:ap_shot",
+      "mass_multiplier": 1.4
+    },
+    "cbc_enhanced_shells:ap_shot_mk5": {
+      "copy": "createbigcannons:ap_shot",
+      "mass_multiplier": 1.5
+    },
+
+    "cbc_enhanced_shells:mortar_shot_mk1": {
+      "copy": "createbigcannons:mortar_shot",
+      "mass_multiplier": 1.1
+    },
+    "cbc_enhanced_shells:mortar_shot_mk2": {
+      "copy": "createbigcannons:mortar_shot",
+      "mass_multiplier": 1.2
+    },
+    "cbc_enhanced_shells:mortar_shot_mk3": {
+      "copy": "createbigcannons:mortar_shot",
+      "mass_multiplier": 1.3
+    },
+    "cbc_enhanced_shells:mortar_shot_mk4": {
+      "copy": "createbigcannons:mortar_shot",
+      "mass_multiplier": 1.4
+    },
+    "cbc_enhanced_shells:mortar_shot_mk5": {
+      "copy": "createbigcannons:mortar_shot",
+      "mass_multiplier": 1.5
+    },
+
+    "cbc_enhanced_shells:bag_of_grapeshot_mk1": {
+      "copy": "createbigcannons:bag_of_grapeshot",
+      "mass_multiplier": 1.1
+    },
+    "cbc_enhanced_shells:bag_of_grapeshot_mk2": {
+      "copy": "createbigcannons:bag_of_grapeshot",
+      "mass_multiplier": 1.2
+    },
+    "cbc_enhanced_shells:bag_of_grapeshot_mk3": {
+      "copy": "createbigcannons:bag_of_grapeshot",
+      "mass_multiplier": 1.3
+    },
+    "cbc_enhanced_shells:bag_of_grapeshot_mk4": {
+      "copy": "createbigcannons:bag_of_grapeshot",
+      "mass_multiplier": 1.4
+    },
+    "cbc_enhanced_shells:bag_of_grapeshot_mk5": {
+      "copy": "createbigcannons:bag_of_grapeshot",
+      "mass_multiplier": 1.5
+    },
+
+    "cbc_enhanced_shells:he_shot_mk1": {
+      "copy": "createbigcannons:he_shot",
+      "mass_multiplier": 1.1
+    },
+    "cbc_enhanced_shells:he_shot_mk2": {
+      "copy": "createbigcannons:he_shot",
+      "mass_multiplier": 1.2
+    },
+    "cbc_enhanced_shells:he_shot_mk3": {
+      "copy": "createbigcannons:he_shot",
+      "mass_multiplier": 1.3
+    },
+    "cbc_enhanced_shells:he_shot_mk4": {
+      "copy": "createbigcannons:he_shot",
+      "mass_multiplier": 1.4
+    },
+    "cbc_enhanced_shells:he_shot_mk5": {
+      "copy": "createbigcannons:he_shot",
+      "mass_multiplier": 1.5
+    },
+
+    "cbc_enhanced_shells:ap_shell_mk1": {
+      "copy": "createbigcannons:ap_shell",
+      "mass_multiplier": 1.1
+    },
+    "cbc_enhanced_shells:ap_shell_mk2": {
+      "copy": "createbigcannons:ap_shell",
+      "mass_multiplier": 1.2
+    },
+    "cbc_enhanced_shells:ap_shell_mk3": {
+      "copy": "createbigcannons:ap_shell",
+      "mass_multiplier": 1.3
+    },
+    "cbc_enhanced_shells:ap_shell_mk4": {
+      "copy": "createbigcannons:ap_shell",
+      "mass_multiplier": 1.4
+    },
+    "cbc_enhanced_shells:ap_shell_mk5": {
+      "copy": "createbigcannons:ap_shell",
+      "mass_multiplier": 1.5
+    },
+
+    "cbc_enhanced_shells:shrapnel_shell_mk1": {
+      "copy": "createbigcannons:shrapnel_shell",
+      "mass_multiplier": 1.1
+    },
+    "cbc_enhanced_shells:shrapnel_shell_mk2": {
+      "copy": "createbigcannons:shrapnel_shell",
+      "mass_multiplier": 1.2
+    },
+    "cbc_enhanced_shells:shrapnel_shell_mk3": {
+      "copy": "createbigcannons:shrapnel_shell",
+      "mass_multiplier": 1.3
+    },
+    "cbc_enhanced_shells:shrapnel_shell_mk4": {
+      "copy": "createbigcannons:shrapnel_shell",
+      "mass_multiplier": 1.4
+    },
+    "cbc_enhanced_shells:shrapnel_shell_mk5": {
+      "copy": "createbigcannons:shrapnel_shell",
+      "mass_multiplier": 1.5
+    },
+
+    "cbc_enhanced_shells:drop_mortar_shell_mk1": {
+      "copy": "createbigcannons:drop_mortar_shell",
+      "mass_multiplier": 1.1
+    },
+    "cbc_enhanced_shells:drop_mortar_shell_mk2": {
+      "copy": "createbigcannons:drop_mortar_shell",
+      "mass_multiplier": 1.2
+    },
+    "cbc_enhanced_shells:drop_mortar_shell_mk3": {
+      "copy": "createbigcannons:drop_mortar_shell",
+      "mass_multiplier": 1.3
+    },
+    "cbc_enhanced_shells:drop_mortar_shell_mk4": {
+      "copy": "createbigcannons:drop_mortar_shell",
+      "mass_multiplier": 1.4
+    },
+    "cbc_enhanced_shells:drop_mortar_shell_mk5": {
+      "copy": "createbigcannons:drop_mortar_shell",
+      "mass_multiplier": 1.5
+    },
+
+    "cbc_enhanced_shells:smoke_shell_mk1": {
+      "copy": "createbigcannons:smoke_shell",
+      "mass_multiplier": 1.1
+    },
+    "cbc_enhanced_shells:smoke_shell_mk2": {
+      "copy": "createbigcannons:smoke_shell",
+      "mass_multiplier": 1.2
+    },
+    "cbc_enhanced_shells:smoke_shell_mk3": {
+      "copy": "createbigcannons:smoke_shell",
+      "mass_multiplier": 1.3
+    },
+    "cbc_enhanced_shells:smoke_shell_mk4": {
+      "copy": "createbigcannons:smoke_shell",
+      "mass_multiplier": 1.4
+    },
+    "cbc_enhanced_shells:smoke_shell_mk5": {
+      "copy": "createbigcannons:smoke_shell",
+      "mass_multiplier": 1.5
+    },
+
+    "cbc_enhanced_shells:shell_holder_mk1": {
+      "type": "container",
+      "empty_mass": 2200.0,
+      "max_children": 4,
+      "allow_recursive": false,
+      "child_item_list_path": "Shells",
+      "child_fallback_mass": 2922.4
+    },
+    "cbc_enhanced_shells:shell_holder_mk2": {
+      "type": "container",
+      "empty_mass": 2200.0,
+      "max_children": 8,
+      "allow_recursive": false,
+      "child_item_list_path": "Shells",
+      "child_fallback_mass": 2922.4
+    },
+    "cbc_enhanced_shells:shell_holder_mk3": {
+      "type": "container",
+      "empty_mass": 2200.0,
+      "max_children": 12,
+      "allow_recursive": false,
+      "child_item_list_path": "Shells",
+      "child_fallback_mass": 2922.4
+    },
+    "cbc_enhanced_shells:shell_holder_mk4": {
+      "type": "container",
+      "empty_mass": 2200.0,
+      "max_children": 16,
+      "allow_recursive": false,
+      "child_item_list_path": "Shells",
+      "child_fallback_mass": 2922.4
+    },
+    "cbc_enhanced_shells:shell_holder_mk5": {
+      "type": "container",
+      "empty_mass": 2200.0,
+      "max_children": 20,
+      "allow_recursive": false,
+      "child_item_list_path": "Shells",
+      "child_fallback_mass": 2922.4
+    },
+
+    "cbc_enhanced_shells:plasma_shell_mk1": {
+      "copy": "createbigcannons:he_shell",
+      "mass_multiplier": 1.2
+    },
+    "cbc_enhanced_shells:plasma_shell_mk2": {
+      "copy": "createbigcannons:he_shell",
+      "mass_multiplier": 1.3
+    },
+    "cbc_enhanced_shells:plasma_shell_mk3": {
+      "copy": "createbigcannons:he_shell",
+      "mass_multiplier": 1.4
+    },
+    "cbc_enhanced_shells:plasma_shell_mk4": {
+      "copy": "createbigcannons:he_shell",
+      "mass_multiplier": 1.5
+    },
+    "cbc_enhanced_shells:plasma_shell_mk5": {
+      "copy": "createbigcannons:he_shell",
+      "mass_multiplier": 1.6
+    },
+
+    "cbc_enhanced_shells:gravitational_shell_mk1": {
+      "copy": "createbigcannons:he_shell",
+      "mass_multiplier": 1.25
+    },
+    "cbc_enhanced_shells:gravitational_shell_mk2": {
+      "copy": "createbigcannons:he_shell",
+      "mass_multiplier": 1.35
+    },
+    "cbc_enhanced_shells:gravitational_shell_mk3": {
+      "copy": "createbigcannons:he_shell",
+      "mass_multiplier": 1.45
+    },
+    "cbc_enhanced_shells:gravitational_shell_mk4": {
+      "copy": "createbigcannons:he_shell",
+      "mass_multiplier": 1.55
+    },
+    "cbc_enhanced_shells:gravitational_shell_mk5": {
+      "copy": "createbigcannons:he_shell",
+      "mass_multiplier": 1.65
+    },
+
+    "cbc_enhanced_shells:vortex_shell_mk1": {
+      "copy": "createbigcannons:he_shell",
+      "mass_multiplier": 1.25
+    },
+    "cbc_enhanced_shells:vortex_shell_mk2": {
+      "copy": "createbigcannons:he_shell",
+      "mass_multiplier": 1.35
+    },
+    "cbc_enhanced_shells:vortex_shell_mk3": {
+      "copy": "createbigcannons:he_shell",
+      "mass_multiplier": 1.45
+    },
+    "cbc_enhanced_shells:vortex_shell_mk4": {
+      "copy": "createbigcannons:he_shell",
+      "mass_multiplier": 1.55
+    },
+    "cbc_enhanced_shells:vortex_shell_mk5": {
+      "copy": "createbigcannons:he_shell",
+      "mass_multiplier": 1.65
+    },
+
+    "cbc_enhanced_shells:disintegration_shell_mk1": {
+      "copy": "createbigcannons:ap_shell",
+      "mass_multiplier": 1.15
+    },
+    "cbc_enhanced_shells:disintegration_shell_mk2": {
+      "copy": "createbigcannons:ap_shell",
+      "mass_multiplier": 1.25
+    },
+    "cbc_enhanced_shells:disintegration_shell_mk3": {
+      "copy": "createbigcannons:ap_shell",
+      "mass_multiplier": 1.35
+    },
+    "cbc_enhanced_shells:disintegration_shell_mk4": {
+      "copy": "createbigcannons:ap_shell",
+      "mass_multiplier": 1.45
+    },
+    "cbc_enhanced_shells:disintegration_shell_mk5": {
+      "copy": "createbigcannons:ap_shell",
+      "mass_multiplier": 1.55
+    },
+
+    "cbc_enhanced_shells:singularity_shell_mk1": {
+      "copy": "createbigcannons:he_shell",
+      "mass_multiplier": 1.35
+    },
+    "cbc_enhanced_shells:singularity_shell_mk2": {
+      "copy": "createbigcannons:he_shell",
+      "mass_multiplier": 1.45
+    },
+    "cbc_enhanced_shells:singularity_shell_mk3": {
+      "copy": "createbigcannons:he_shell",
+      "mass_multiplier": 1.55
+    },
+    "cbc_enhanced_shells:singularity_shell_mk4": {
+      "copy": "createbigcannons:he_shell",
+      "mass_multiplier": 1.65
+    },
+    "cbc_enhanced_shells:singularity_shell_mk5": {
+      "copy": "createbigcannons:he_shell",
+      "mass_multiplier": 1.75
+    },
+
+    "cbc_enhanced_shells:nuclear_shell": {
+      "copy": "createbigcannons:he_shell",
+      "mass_multiplier": 1.5
+    },
+    "cbc_enhanced_shells:nuclear_shell_mk2": {
+      "copy": "createbigcannons:he_shell",
+      "mass_multiplier": 2.5
+    },
+
+    "cbc_enhanced_shells:h_bomb_shell": {
+      "copy": "createbigcannons:he_shell",
+      "mass_multiplier": 2.75
+    },
+    "cbc_enhanced_shells:h_bomb_mini_shell": {
+      "copy": "createbigcannons:he_shell",
+      "mass_multiplier": 1.75
+    },
+
+    "cbc_enhanced_shells:cluster_shell_mk1": {
+      "copy": "createbigcannons:he_shell",
+      "mass_multiplier": 1.25
+    },
+    "cbc_enhanced_shells:cluster_shell_mk2": {
+      "copy": "createbigcannons:he_shell",
+      "mass_multiplier": 1.35
+    },
+    "cbc_enhanced_shells:cluster_shell_mk3": {
+      "copy": "createbigcannons:he_shell",
+      "mass_multiplier": 1.45
+    },
+    "cbc_enhanced_shells:cluster_shell_mk4": {
+      "copy": "createbigcannons:he_shell",
+      "mass_multiplier": 1.55
+    },
+    "cbc_enhanced_shells:cluster_shell_mk5": {
+      "copy": "createbigcannons:he_shell",
+      "mass_multiplier": 1.65
+    },
+
+    "cbc_enhanced_shells:bunker_buster_shell_mk1": {
+      "copy": "createbigcannons:ap_shell",
+      "mass_multiplier": 1.35
+    },
+    "cbc_enhanced_shells:bunker_buster_shell_mk2": {
+      "copy": "createbigcannons:ap_shell",
+      "mass_multiplier": 1.45
+    },
+    "cbc_enhanced_shells:bunker_buster_shell_mk3": {
+      "copy": "createbigcannons:ap_shell",
+      "mass_multiplier": 1.55
+    },
+    "cbc_enhanced_shells:bunker_buster_shell_mk4": {
+      "copy": "createbigcannons:ap_shell",
+      "mass_multiplier": 1.65
+    },
+    "cbc_enhanced_shells:bunker_buster_shell_mk5": {
+      "copy": "createbigcannons:ap_shell",
+      "mass_multiplier": 1.75
+    }
+  }
+}

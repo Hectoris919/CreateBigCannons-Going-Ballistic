@@ -1,0 +1,24 @@
+{
+  "values": {
+    "cbc_enhanced_shells:powder_charge_mk1": {
+      "type": "powder_charge",
+      "charge_equivalents": 1.25
+    },
+    "cbc_enhanced_shells:powder_charge_mk2": {
+      "type": "powder_charge",
+      "charge_equivalents": 1.5
+    },
+    "cbc_enhanced_shells:powder_charge_mk3": {
+      "type": "powder_charge",
+      "charge_equivalents": 1.75
+    },
+    "cbc_enhanced_shells:powder_charge_mk4": {
+      "type": "powder_charge",
+      "charge_equivalents": 2.0
+    },
+    "cbc_enhanced_shells:powder_charge_mk5": {
+      "type": "powder_charge",
+      "charge_equivalents": 2.25
+    }
+  }
+}

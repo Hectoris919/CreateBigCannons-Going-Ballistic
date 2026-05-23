@@ -1,0 +1,37 @@
+{
+  "values": {
+    "createbigcannons:powder_charge": {
+      "type": "powder_charge",
+      "charge_equivalents": 1.0
+    },
+    "createbigcannons:big_cartridge{components:{\"createbigcannons:power\":0}}": {
+      "type": "big_cannon_cartridge",
+      "charge_equivalents": 0.0
+    },
+    "createbigcannons:big_cartridge{components:{\"createbigcannons:power\":1}}": {
+      "type": "big_cannon_cartridge",
+      "charge_equivalents": 1.0
+    },
+    "createbigcannons:big_cartridge{components:{\"createbigcannons:power\":2}}": {
+      "type": "big_cannon_cartridge",
+      "charge_equivalents": 2.0
+    },
+    "createbigcannons:big_cartridge{components:{\"createbigcannons:power\":3}}": {
+      "type": "big_cannon_cartridge",
+      "charge_equivalents": 3.0
+    },
+    "createbigcannons:big_cartridge{components:{\"createbigcannons:power\":4}}": {
+      "type": "big_cannon_cartridge",
+      "charge_equivalents": 4.0
+    },
+    "createbigcannons:autocannon_cartridge{components:{\"createbigcannons:projectile\":[{item:{count:1,id:\"createbigcannons:flak_autocannon_round\"}]}}}": {
+      "type": "autocannon_cartridge"
+    },
+    "createbigcannons:autocannon_cartridge{components:{\"createbigcannons:projectile\":[{item:{count:1,id:\"createbigcannons:ap_autocannon_round\"}]}}}": {
+      "type": "autocannon_cartridge"
+    },
+    "createbigcannons:machine_gun_round": {
+      "type": "machine_gun_round"
+    }
+  }
+}

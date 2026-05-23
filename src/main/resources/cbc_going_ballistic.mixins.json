@@ -7,13 +7,13 @@
     "AbstractAutocannonProjectileBlockDamageMixin",
     "AbstractCannonProjectileBlockDamageMixin",
     "AbstractCannonProjectilePhysicsMixin",
+    "AbstractCannonProjectileShotDataMixin",
     "FluidShellProjectileAccessor",
     "MortarStoneProjectileMixin",
     "MountedAutocannonContraptionMixin",
     "MountedCannonContraptionMixin"
   ],
-  "client": [
-  ],
+  "client": [],
   "injectors": {
     "defaultRequire": 1
   },

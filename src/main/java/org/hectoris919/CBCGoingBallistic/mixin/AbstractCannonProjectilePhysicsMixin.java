@@ -1,9 +1,9 @@
 package org.hectoris919.CBCGoingBallistic.mixin;
 
-//import net.minecraft.world.level.material.FluidState;
 import org.hectoris919.CBCGoingBallistic.Config;
 import org.hectoris919.CBCGoingBallistic.ballistics.BallisticProjectileHelper;
 import org.hectoris919.CBCGoingBallistic.ballistics.ProjectilePhysicsMath;
+import org.hectoris919.CBCGoingBallistic.data.BallisticsParameterRegistry;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -43,21 +43,18 @@ public abstract class AbstractCannonProjectilePhysicsMixin {
 			return;
 		}
 
-//		FluidState fluidState = projectile.level().getFluidState(projectile.blockPosition());
-//		boolean inFluid = !fluidState.isEmpty();
-
 		double massKg = BallisticProjectileHelper.getProjectileMassKg(projectile);
 		double dimensionDragMultiplier = DimensionMunitionPropertiesHandler
 				.getProperties(projectile.level())
 				.dragMultiplier();
 
-		double airDensityKgPerM3 = Config.airDensity() * dimensionDragMultiplier;
+		double airDensityKgPerM3 = BallisticsParameterRegistry.airDensity() * dimensionDragMultiplier;
 
 		double dragAcceleration = ProjectilePhysicsMath.dragAccelerationBlocksPerTickSquared(
 				projectile,
 				velocityBlocksPerTick,
 				massKg,
-				Config.projectileDragCoefficient(),
+				BallisticsParameterRegistry.projectileDragCoefficient(),
 				airDensityKgPerM3
 		);
 

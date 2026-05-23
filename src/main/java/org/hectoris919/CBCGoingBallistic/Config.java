@@ -10,106 +10,20 @@ public class Config {
 			.define("disableRealisticBallistics", false);
 
 	private static final ModConfigSpec.BooleanValue DISABLE_REALISTIC_BLOCK_DAMAGE = BUILDER
-			.comment("Disables Going Ballistic's impact-energy (kg/m/s) block damage calculation.")
+			.comment("Disables Going Ballistic's impact-energy block damage calculation.")
 			.define("disableRealisticBlockDamage", false);
 
 	private static final ModConfigSpec.BooleanValue DISABLE_REALISTIC_PROJECTILE_GRAVITY = BUILDER
-			.comment("Uses Earth gravity for cannon projectiles: -9.80665 m/s^2 converted to blocks/tick^2.")
-			.define("projectilePhysics.enableRealisticGravity", false);
+			.comment("Disables Going Ballistic's Earth-gravity projectile override.")
+			.define("projectilePhysics.disableRealisticGravity", false);
 
 	private static final ModConfigSpec.BooleanValue DISABLE_REALISTIC_PROJECTILE_DRAG = BUILDER
-			.comment("Calculates projectile drag from NASA's drag equation instead of using CBC's static projectile drag value.")
-			.define("projectilePhysics.enableRealisticDrag", false);
+			.comment("Disables Going Ballistic's quadratic projectile drag override.")
+			.define("projectilePhysics.disableRealisticDrag", false);
 
 	private static final ModConfigSpec.BooleanValue DEBUG_BALLISTICS = BUILDER
-			.comment("Logs debug information whenever a shot is calculated.")
+			.comment("Logs debug information whenever a shot or impact is calculated.")
 			.define("debugBallistics", false);
-
-	private static final ModConfigSpec.DoubleValue AIR_DENSITY = BUILDER
-			.comment("Air density used for drag calculations, in kg/m^3. 1.225 is ISA sea-level density.")
-			.defineInRange("projectilePhysics.airDensity", 1.225D, 0.0D, 10000.0D);
-
-	private static final ModConfigSpec.DoubleValue PROJECTILE_DRAG_COEFFICIENT = BUILDER
-			.comment("Projectile drag coefficient Cd. 0.47 is a reasonable blunt/spherical default; lower values are more streamlined.")
-			.defineInRange("projectilePhysics.dragCoefficient", 0.47D, 0.0D, 10.0D);
-
-
-	private static final ModConfigSpec.DoubleValue MACHINE_GUN_BULLET_RADIUS = BUILDER
-			.comment("Machine gun bullet radius in meters. Based off of a .308 / 7.62x51 round, with its width scaled up slightly")
-			.defineInRange("projectilePhysics.machineGunBulletRadiusMeters", (0.00782D / 2.0D) * Math.cbrt(0.012D / 0.00945D), 0.000001D, 1.0D);
-
-
-	private static final ModConfigSpec.DoubleValue VELOCITY_MULTIPLIER = BUILDER
-			.comment("Global multiplier applied after the physical muzzle velocity calculation.")
-			.defineInRange("velocityMultiplier", 1.0D, 0.01D, 100.0D);
-
-	private static final ModConfigSpec.DoubleValue PROJECTILE_MASS_FALLBACK = BUILDER
-			.comment("Mass used when a projectile has no datapack mass entry.")
-			.defineInRange("projectileMassFallback", 3519.5D, 0.001D, 1.0E9D);
-
-	private static final ModConfigSpec.DoubleValue AUTOCANNON_PROJECTILE_MASS_FALLBACK = BUILDER
-			.comment("Mass used when an autocannon projectile has no datapack mass entry.")
-			.defineInRange("autocannonProjectileMassFallback", 33.0D, 0.001D, 1.0E9D);
-
-	private static final ModConfigSpec.DoubleValue ROBINS_CONSTANT_MPS = BUILDER
-			.comment("Robins muzzle velocity constant, 1991 ft/s converted to m/s.")
-			.defineInRange("robinsConstantMps", 606.8568D, 1.0D, 10000.0D);
-
-	private static final double BLACK_POWDER_DENSITY = 1700.0D;
-	private static final double PC_MASS = BLACK_POWDER_DENSITY * Math.PI * Math.pow(((2.0D/16.0D) + Math.sqrt(Math.pow(2.0D/16.0D, 2.0D) + Math.pow(2.0D/16.0D, 2.0D))) / 2.0D, 2.0D);
-	private static final double AC_MASS = BLACK_POWDER_DENSITY * Math.PI * 0.75 * Math.pow(((1.0D/16.0D) + Math.sqrt(Math.pow(1.0D/16.0D, 2.0D) + Math.pow(1.0D/16.0D, 2.0D))) / 2.0D, 2.0D);
-
-	private static final ModConfigSpec.DoubleValue POWDER_CHARGE_DIAMETER = BUILDER
-			.comment("Diameter (m) of a powder charge.")
-			.defineInRange("powderChargeDiameter", ((5.0D/16.0D) + Math.sqrt(Math.pow(5.0D/16.0D, 2.0D) + Math.pow(5.0D/16.0D, 2.0D))), 0.000001D, 10000.0D);
-
-	private static final ModConfigSpec.DoubleValue POWDER_CHARGE_LENGTH = BUILDER
-			.comment("Length (m) of a powder charge.")
-			.defineInRange("powderChargeLength", 1.0D, 0.000001D, 10000.0D);
-
-	private static final ModConfigSpec.DoubleValue AUTOCANNON_CARTRIDGE_DIAMETER = BUILDER
-			.comment("Diameter (m) of an autocannon cartridge.")
-			.defineInRange("autocannonChargeDiameter", ((1.0D/16.0D) + Math.sqrt(Math.pow(1.0D/16.0D, 2.0D) + Math.pow(1.0D/16.0D, 2.0D))), 0.000001D, 10000.0D);
-
-	private static final ModConfigSpec.DoubleValue AUTOCANNON_CARTRIDGE_LENGTH = BUILDER
-			.comment("Length (m) of an autocannon cartridge.")
-			.defineInRange("autocannonChargeLength", 0.75D, 0.000001D, 10000.0D);
-
-	private static final ModConfigSpec.DoubleValue POWDER_CHARGE_MASS = BUILDER
-			.comment("Gunpowder mass (kg) within a powder charge.")
-			.defineInRange("powderChargeMass", PC_MASS, 0.001D, 1.0E9D);
-
-	private static final ModConfigSpec.DoubleValue AUTOCANNON_POWDER_MASS = BUILDER
-			.comment("Gunpowder mass (kg) within an autocannon cartridge.")
-			.defineInRange("autocannonPowderMass", AC_MASS, 0.001D, 1.0E9D);
-
-	private static final ModConfigSpec.DoubleValue BLACK_POWDER_ENERGY_J_PER_KG = BUILDER
-			.comment("Chemical energy within black powder (J/kg)")
-			.defineInRange("blackPowderEnergyJoulesPerKg", 3000000.0D, 1.0D, 1.0E12D);
-
-	private static final ModConfigSpec.DoubleValue JOULES_PER_TOUGHNESS_POINT = BUILDER
-			.comment("Impact energy required per block toughness point for a projectile to penetrate a block.")
-			.defineInRange("blockDamage.joulesPerToughnessPoint", 2000000.0D, 1.0D, 1.0E12D);
-
-	private static final ModConfigSpec.DoubleValue AUTOCANNON_JOULES_PER_BLOCK_DAMAGE_POINT = BUILDER
-			.comment("Impact energy required for autocannon rounds to impart a partial block damage point on a block.")
-			.defineInRange("blockDamage.autocannonJoulesPerBlockDamagePoint", 25000.0D, 1.0D, 1.0E12D);
-
-	private static final ModConfigSpec.DoubleValue MACHINE_GUN_JOULES_PER_BLOCK_DAMAGE_POINT = BUILDER
-			.comment("Impact energy required for machine gun bullets to impart a partial block damage point on a block.")
-			.defineInRange("blockDamage.machineGunJoulesPerBlockDamagePoint", 12000.0D, 1.0D, 1.0E12D);
-
-	private static final ModConfigSpec.DoubleValue MIN_HARD_TARGET_DAMAGE_FACTOR = BUILDER
-			.comment("Minimum fraction of autocannon/machine gun block damage retained after block hardness vs projectile toughness attenuation.")
-			.defineInRange("blockDamage.minHardTargetDamageFactor", 0.05D, 0.0D, 1.0D);
-
-	private static final ModConfigSpec.DoubleValue AP_PROJECTILE_BLOCK_DAMAGE_MULTIPLIER = BUILDER
-			.comment("Block damage multiplier for AP-named projectiles.")
-			.defineInRange("blockDamage.apProjectileBlockDamageMultiplier", 1.75D, 0.0D, 1000.0D);
-
-	private static final ModConfigSpec.DoubleValue SMALL_ARMS_BLOCK_DAMAGE_MULTIPLIER = BUILDER
-			.comment("Block damage multiplier for flak and machine gun projectiles.")
-			.defineInRange("blockDamage.smallArmsBlockDamageMultiplier", 0.35D, 0.0D, 1000.0D);
 
 	public static final ModConfigSpec SPEC = BUILDER.build();
 
@@ -118,26 +32,4 @@ public class Config {
 	public static boolean disableRealisticProjectileGravity() { return DISABLE_REALISTIC_PROJECTILE_GRAVITY.get(); }
 	public static boolean disableRealisticProjectileDrag() { return DISABLE_REALISTIC_PROJECTILE_DRAG.get(); }
 	public static boolean debugBallistics() { return DEBUG_BALLISTICS.get(); }
-	public static double airDensity() { return AIR_DENSITY.get(); }
-	public static double projectileDragCoefficient() { return PROJECTILE_DRAG_COEFFICIENT.get(); }
-	public static double velocityMultiplier() { return VELOCITY_MULTIPLIER.get(); }
-	public static double projectileMassFallback() { return PROJECTILE_MASS_FALLBACK.get(); }
-	public static double autocannonProjectileMassFallback() { return AUTOCANNON_PROJECTILE_MASS_FALLBACK.get(); }
-	public static double robinsConstantMps() { return ROBINS_CONSTANT_MPS.get(); }
-
-	public static double powderChargeMass() { return POWDER_CHARGE_MASS.get(); }
-	public static double powderChargeDiameter() { return POWDER_CHARGE_DIAMETER.get(); }
-	public static double powderChargeLength() { return POWDER_CHARGE_LENGTH.get(); }
-	public static double autocannonPowderMass() { return AUTOCANNON_POWDER_MASS.get(); }
-	public static double autocannonCartridgeDiameter() { return AUTOCANNON_CARTRIDGE_DIAMETER.get(); }
-	public static double autocannonCartridgeLength() { return AUTOCANNON_CARTRIDGE_LENGTH.get(); }
-
-	public static double blackPowderEnergyJoulesPerKg() { return BLACK_POWDER_ENERGY_J_PER_KG.get(); }
-	public static double joulesPerToughnessPoint() { return JOULES_PER_TOUGHNESS_POINT.get(); }
-	public static double autocannonJoulesPerBlockDamagePoint() { return AUTOCANNON_JOULES_PER_BLOCK_DAMAGE_POINT.get(); }
-	public static double machineGunJoulesPerBlockDamagePoint() { return MACHINE_GUN_JOULES_PER_BLOCK_DAMAGE_POINT.get(); }
-	public static double machineGunBulletRadius() { return MACHINE_GUN_BULLET_RADIUS.get(); }
-	public static double minHardTargetDamageFactor() { return MIN_HARD_TARGET_DAMAGE_FACTOR.get(); }
-	public static double apProjectileBlockDamageMultiplier() { return AP_PROJECTILE_BLOCK_DAMAGE_MULTIPLIER.get(); }
-	public static double smallArmsBlockDamageMultiplier() { return SMALL_ARMS_BLOCK_DAMAGE_MULTIPLIER.get(); }
 }

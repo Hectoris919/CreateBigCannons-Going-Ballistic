@@ -1,0 +1,43 @@
+{
+  "values": {
+    "cbc_at:cluster_projectile": {
+      "copy": "createbigcannons:he_shell",
+      "mass_multiplier": 1.5
+    },
+
+    "cbc_at:apds_projectile": {
+      "mass": 24.6
+    },
+    "cbc_at:apdsfs_projectile": {
+      "mass": 23.5
+    },
+    "cbc_at:he_projectile": {
+      "mass": 19.9
+    },
+    "cbc_at:hei_projectile": {
+      "mass": 20.1
+    },
+
+    "cbc_at:ha_ap_projectile": {
+      "mass": 227.1
+    },
+    "cbc_at:ha_apds_projectile": {
+      "mass": 196.7
+    },
+    "cbc_at:ha_apdsfs_projectile": {
+      "mass": 187.8
+    },
+    "cbc_at:ha_he_projectile": {
+      "mass": 157.4
+    },
+    "cbc_at:ha_hef_projectile": {
+      "mass": 175.2
+    },
+    "cbc_at:ha_heat_projectile": {
+      "mass": 200.3
+    },
+    "cbc_at:ha_smoke_projectile": {
+      "mass": 107.3
+    }
+  }
+}

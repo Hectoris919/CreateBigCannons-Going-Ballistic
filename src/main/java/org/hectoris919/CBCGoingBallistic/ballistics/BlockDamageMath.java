@@ -2,6 +2,7 @@ package org.hectoris919.CBCGoingBallistic.ballistics;
 
 import org.hectoris919.CBCGoingBallistic.Config;
 import org.hectoris919.CBCGoingBallistic.GoingBallistic;
+import org.hectoris919.CBCGoingBallistic.data.BallisticsParameterRegistry;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
@@ -22,14 +23,14 @@ public final class BlockDamageMath {
 	}
 
 	public static double cannonDamageScore(double normalImpactEnergyJ, double constructionMultiplier) {
-		double joulesPerPoint = Math.max(Config.joulesPerToughnessPoint(), 1.0D);
+		double joulesPerPoint = Math.max(BallisticsParameterRegistry.joulesPerToughnessPoint(), 1.0D);
 		return normalImpactEnergyJ / joulesPerPoint * safeMultiplier(constructionMultiplier);
 	}
 
 	public static int autocannonDamagePoints(Entity projectile, double normalImpactEnergyJ, double constructionMultiplier) {
 		double joulesPerPoint = isMachineGunProjectile(projectile)
-				? Math.max(Config.machineGunJoulesPerBlockDamagePoint(), 1.0D)
-				: Math.max(Config.autocannonJoulesPerBlockDamagePoint(), 1.0D);
+				? Math.max(BallisticsParameterRegistry.machineGunJoulesPerBlockDamagePoint(), 1.0D)
+				: Math.max(BallisticsParameterRegistry.autocannonJoulesPerBlockDamagePoint(), 1.0D);
 		double rawDamage = normalImpactEnergyJ / joulesPerPoint * safeMultiplier(constructionMultiplier);
 		int damage = (int) Math.ceil(Math.max(0.0D, rawDamage));
 		return Math.max(damage, 0);
@@ -39,14 +40,14 @@ public final class BlockDamageMath {
 		if (hardnessPenalty <= 1.0E-2D) return 1.0D;
 		if (projectileToughness <= 1.0E-2D) return 0.0D;
 
-		double min = Math.max(0.0D, Math.min(1.0D, Config.minHardTargetDamageFactor()));
+		double min = Math.max(0.0D, Math.min(1.0D, BallisticsParameterRegistry.minHardTargetDamageFactor()));
 		return Math.max(min, 1.0D - hardnessPenalty / projectileToughness);
 	}
 
 	public static double projectileConstructionMultiplier(Entity projectile) {
 		String projectileId = String.valueOf(BallisticProjectileHelper.getProjectileId(projectile));
-		if (projectileId.contains("ap_autocannon") || projectileId.contains("ap_shot") || projectileId.contains("ap_shell") || projectileId.contains("armor_piercing")) return Config.apProjectileBlockDamageMultiplier();
-		if (projectileId.contains("flak") || projectileId.contains("machine_gun")) return Config.smallArmsBlockDamageMultiplier();
+		if (projectileId.contains("ap_autocannon") || projectileId.contains("ap_shot") || projectileId.contains("ap_shell") || projectileId.contains("armor_piercing")) return BallisticsParameterRegistry.apProjectileBlockDamageMultiplier();
+		if (projectileId.contains("flak") || projectileId.contains("machine_gun")) return BallisticsParameterRegistry.smallArmsBlockDamageMultiplier();
 		return 1.0D;
 	}
 

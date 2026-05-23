@@ -1,7 +1,6 @@
 package org.hectoris919.CBCGoingBallistic.data;
 
 import net.minecraft.resources.ResourceLocation;
-import org.hectoris919.CBCGoingBallistic.Config;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;

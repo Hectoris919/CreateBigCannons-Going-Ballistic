@@ -2,23 +2,44 @@ package org.hectoris919.CBCGoingBallistic.ballistics;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
 import org.hectoris919.CBCGoingBallistic.Config;
+import org.hectoris919.CBCGoingBallistic.api.GoingBallisticShotData;
+import org.hectoris919.CBCGoingBallistic.api.GoingBallisticShotDataHolder;
 import org.hectoris919.CBCGoingBallistic.GoingBallistic;
 import org.hectoris919.CBCGoingBallistic.data.BallisticsParameterRegistry;
+import org.hectoris919.CBCGoingBallistic.data.CannonComponentProperties;
+import org.hectoris919.CBCGoingBallistic.data.CannonComponentRegistry;
+import org.hectoris919.CBCGoingBallistic.data.ItemProjectileRegistry;
 import org.hectoris919.CBCGoingBallistic.data.ProjectileMassProperties;
 import org.hectoris919.CBCGoingBallistic.data.ProjectileMassRegistry;
+import org.hectoris919.CBCGoingBallistic.data.PropellantProperties;
+import org.hectoris919.CBCGoingBallistic.data.PropellantRegistry;
 import org.hectoris919.CBCGoingBallistic.mixin.FluidShellProjectileAccessor;
 import rbasamoyai.createbigcannons.cannon_control.contraption.AbstractMountedCannonContraption;
+import rbasamoyai.createbigcannons.index.CBCDataComponents;
 import rbasamoyai.createbigcannons.munitions.big_cannon.fluid_shell.EndFluidStack;
+import rbasamoyai.createbigcannons.munitions.autocannon.AutocannonCartridgeItem;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 public final class BallisticProjectileHelper {
 	private static final double MIN_BARREL_LENGTH_METERS = 0.25D;
@@ -35,8 +56,9 @@ public final class BallisticProjectileHelper {
 		if (Config.disableRealisticBallistics()) return cbcChargePower;
 
 		double projectileMassKg = getProjectileMassKg(projectile);
-		double barrelLengthMeters = estimateMountedBarrelLengthMeters(contraption);
-		double velocityMps = BallisticsMath.getCannonVelocityFromChargePowerMps(projectileMassKg, cbcChargePower, barrelLengthMeters);
+		BarrelProfile barrelProfile = estimateMountedBarrelProfile(contraption);
+		double barrelLengthMeters = barrelProfile.lengthMeters();
+		double velocityMps = BallisticsMath.getCannonVelocityFromChargePowerMps(projectileMassKg, cbcChargePower, barrelLengthMeters) * barrelProfile.velocityMultiplier();
 		float velocityBlocksPerTick = BallisticsMath.mpsToBPTFloat(velocityMps);
 
 		logCannonCalculation("launch", projectile, projectileMassKg, cbcChargePower, barrelLengthMeters, velocityMps, velocityBlocksPerTick);
@@ -50,8 +72,12 @@ public final class BallisticProjectileHelper {
 		if (Config.disableRealisticBallistics()) return originalVelocity;
 
 		ProjectileMassProperties properties = getProjectileMassProperties(projectile);
-		double projectileMassKg = getProjectileMassKg(projectile, Config.autocannonProjectileMassFallback());
-		double barrelLengthMeters = estimateMountedBarrelLengthMeters(contraption);
+		GoingBallisticShotData shotData = getShotData(projectile);
+		double projectileMassKg = shotData == null
+				? getProjectileMassKg(projectile, BallisticsParameterRegistry.autocannonProjectileMassFallback())
+				: shotData.projectileMassKgOr(getProjectileMassKg(projectile, BallisticsParameterRegistry.autocannonProjectileMassFallback()));
+		BarrelProfile barrelProfile = estimateMountedBarrelProfile(contraption);
+		double barrelLengthMeters = barrelProfile.lengthMeters();
 		double powderMassKg = properties == null
 				? BallisticsParameterRegistry.autocannonPowderMass()
 				: properties.autocannonPowderMassKgOr(BallisticsParameterRegistry.autocannonPowderMass());
@@ -61,7 +87,12 @@ public final class BallisticProjectileHelper {
 		double localVelocityMultiplier = properties == null
 				? 1.0D
 				: properties.autocannonVelocityMultiplierOr(1.0D);
-		double velocityMps = BallisticsMath.getRobinsVelocityMps(projectileMassKg, powderMassKg, chargeLengthMeters, barrelLengthMeters, localVelocityMultiplier);
+		if (shotData != null) {
+			powderMassKg = shotData.powderMassKgOr(powderMassKg);
+			chargeLengthMeters = shotData.chargeLengthMetersOr(chargeLengthMeters);
+			localVelocityMultiplier *= shotData.velocityMultiplier();
+		}
+		double velocityMps = BallisticsMath.getRobinsVelocityMps(projectileMassKg, powderMassKg, chargeLengthMeters, barrelLengthMeters, localVelocityMultiplier) * barrelProfile.velocityMultiplier();
 		float velocityBlocksPerTick = BallisticsMath.mpsToBPTFloat(velocityMps);
 
 		logAutocannonCalculation(projectile, projectileMassKg, originalVelocity, powderMassKg, chargeLengthMeters, localVelocityMultiplier, barrelLengthMeters, velocityMps, velocityBlocksPerTick);
@@ -96,6 +127,14 @@ public final class BallisticProjectileHelper {
 		return squib;
 	}
 
+	public static GoingBallisticShotData getShotData(Entity projectile) {
+		return projectile instanceof GoingBallisticShotDataHolder holder ? holder.goingballistic$getShotData() : null;
+	}
+
+	public static void attachShotData(Entity projectile, GoingBallisticShotData data) {
+		if (projectile instanceof GoingBallisticShotDataHolder holder) holder.goingballistic$setShotData(data);
+	}
+
 	public static ProjectileMassProperties getProjectileMassProperties(Entity projectile) {
 		ResourceLocation projectileId = getProjectileId(projectile);
 		if (projectileId == null) return null;
@@ -108,15 +147,24 @@ public final class BallisticProjectileHelper {
 		return 0.5D * massKg * velocityMps * velocityMps;
 	}
 
-	public static double getProjectileMassKg(Entity projectile) { return getProjectileMassKg(projectile, Config.projectileMassFallback()); }
+	public static double getProjectileMassKg(Entity projectile) { return getProjectileMassKg(projectile, BallisticsParameterRegistry.projectileMassFallback()); }
 	public static double getProjectileMassKg(Entity projectile, double fallbackMassKg) {
 		if (projectile == null) return fallbackMassKg;
+
+		GoingBallisticShotData shotData = getShotData(projectile);
+		if (shotData != null && shotData.hasProjectileMass()) return shotData.projectileMassKg();
 
 		ResourceLocation projectileId = getProjectileId(projectile);
 		ProjectileMassProperties properties = ProjectileMassRegistry.getProperties(projectileId).orElse(null);
 		if (properties == null) {
 			if (Config.debugBallistics()) GoingBallistic.LOGGER.info("[Going Ballistic] No mass entry for {}; using fallback {} kg", projectileId, fallbackMassKg);
 			return fallbackMassKg;
+		}
+
+		if (properties.projectileContainer()) {
+			double childMass = tryReadContainedProjectileMass(projectile, properties);
+			if (childMass >= 0.0D) return properties.massWithChildren(childMass);
+			return properties.massKg();
 		}
 
 		if (!properties.fluidContainer()) return properties.massKg();
@@ -135,28 +183,207 @@ public final class BallisticProjectileHelper {
 		return BuiltInRegistries.ENTITY_TYPE.getKey(projectile.getType());
 	}
 
-	public static double estimateMountedBarrelLengthMeters(AbstractMountedCannonContraption contraption) {
-		if (contraption == null) return MIN_BARREL_LENGTH_METERS;
+	public static BarrelProfile estimateMountedBarrelProfile(AbstractMountedCannonContraption contraption) {
+		if (contraption == null) return new BarrelProfile(MIN_BARREL_LENGTH_METERS, 1.0D);
 
 		Direction direction = contraption.initialOrientation();
 		BlockPos startPos = contraption.getStartPos();
 		Map<BlockPos, StructureBlockInfo> blocks = contraption.getBlocks();
-		if (direction == null || startPos == null || blocks == null || blocks.isEmpty()) return MIN_BARREL_LENGTH_METERS;
+		if (direction == null || startPos == null || blocks == null || blocks.isEmpty()) return new BarrelProfile(MIN_BARREL_LENGTH_METERS, 1.0D);
 
-		int contiguousBlocks = 0;
+		double lengthMeters = 0.0D;
+		double velocityMultiplier = 1.0D;
 		BlockPos pos = startPos;
 		for (int i = 0; i < MAX_BARREL_SCAN_BLOCKS; ++i) {
-			if (!blocks.containsKey(pos)) break;
-			++contiguousBlocks;
+			StructureBlockInfo blockInfo = blocks.get(pos);
+			if (blockInfo == null) break;
+
+			ResourceLocation blockId = BuiltInRegistries.BLOCK.getKey(blockInfo.state().getBlock());
+			CannonComponentProperties component = CannonComponentRegistry.get(blockId).orElse(CannonComponentProperties.normalBarrel());
+			lengthMeters += component.lengthMeters();
+			velocityMultiplier *= component.velocityMultiplier();
 			pos = pos.relative(direction);
 		}
 
-		if (contiguousBlocks <= 0) {
+		if (lengthMeters <= 0.0D) {
 			GoingBallistic.LOGGER.debug("Could not estimate cannon barrel length from mounted contraption {}; using {} m", contraption.getClass().getName(), MIN_BARREL_LENGTH_METERS);
-			return MIN_BARREL_LENGTH_METERS;
+			return new BarrelProfile(MIN_BARREL_LENGTH_METERS, 1.0D);
 		}
 
-		return Math.max(contiguousBlocks, MIN_BARREL_LENGTH_METERS);
+		return new BarrelProfile(Math.max(lengthMeters, MIN_BARREL_LENGTH_METERS), velocityMultiplier);
+	}
+
+	private static double tryReadContainedProjectileMass(Entity projectile, ProjectileMassProperties properties) {
+		if (projectile == null) return -1.0D;
+		try {
+			CompoundTag tag = projectile.saveWithoutId(new CompoundTag());
+			ListTag childList = getCompoundListAtPath(tag, properties.childItemListPath());
+			if (childList == null || childList.isEmpty()) return 0.0D;
+
+			HolderLookup.Provider registries = projectile.level().registryAccess();
+			double childMass = 0.0D;
+			int maxChildren = properties.maxContainedProjectiles() > 0 ? properties.maxContainedProjectiles() : childList.size();
+			for (int i = 0; i < childList.size() && i < maxChildren; ++i) {
+				CompoundTag childTag = childList.getCompound(i);
+				ItemStack childStack = parseItemStack(registries, childTag);
+				if (childStack.isEmpty()) {
+					childMass += properties.childFallbackMassKg();
+					continue;
+				}
+				childMass += getProjectileItemMassKg(childStack, registries, properties.childFallbackMassKg(), properties.allowRecursiveContainers(), new HashSet<>());
+			}
+			return childMass;
+		} catch (RuntimeException | LinkageError ex) {
+			GoingBallistic.LOGGER.debug("Could not read contained projectile mass from {}", projectile.getType(), ex);
+			return -1.0D;
+		}
+	}
+
+	public static double getProjectileItemMassKg(ItemStack stack, HolderLookup.Provider registries, double fallbackMassKg, boolean allowRecursiveContainers, Set<ResourceLocation> visitedProjectiles) {
+		if (stack == null || stack.isEmpty()) return 0.0D;
+		ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(stack.getItem());
+		Optional<ResourceLocation> projectileId = ItemProjectileRegistry.getProjectileId(stack, registries).or(() -> ItemProjectileRegistry.getProjectileId(itemId));
+		if (projectileId.isEmpty()) return fallbackMassKg;
+		ProjectileMassProperties properties = ProjectileMassRegistry.getProperties(projectileId.get()).orElse(null);
+		if (properties == null) return fallbackMassKg;
+
+		if (properties.projectileContainer()) {
+			if (!allowRecursiveContainers && !visitedProjectiles.add(projectileId.get())) return properties.massKg();
+			double children = tryReadContainedProjectileMass(stack, registries, properties, allowRecursiveContainers, visitedProjectiles);
+			return properties.massWithChildren(children);
+		}
+
+		if (properties.fluidContainer()) {
+			FluidPayload payload = tryReadFluidPayloadFromItemStack(stack, registries);
+			return payload == null ? properties.massKg() : properties.massWithFluid(payload.fillFraction(), payload.fluidDensityKgPerM3());
+		}
+
+		return properties.massKg();
+	}
+
+	public static void attachShotDataFromAutocannonAmmoStack(Entity projectile, ItemStack firedStack, HolderLookup.Provider registries) {
+		if (projectile == null || firedStack == null || firedStack.isEmpty()) return;
+		GoingBallisticShotData data = buildShotDataFromAutocannonAmmoStack(firedStack, registries);
+		if (data != null) attachShotData(projectile, data);
+	}
+
+	public static GoingBallisticShotData buildShotDataFromAutocannonAmmoStack(ItemStack firedStack, HolderLookup.Provider registries) {
+		if (firedStack == null || firedStack.isEmpty()) return null;
+		ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(firedStack.getItem());
+		Optional<ResourceLocation> projectileId = ItemProjectileRegistry.getProjectileId(firedStack, registries)
+				.or(() -> ItemProjectileRegistry.getProjectileId(itemId));
+
+		ItemStack projectileStack = ItemStack.EMPTY;
+		if (firedStack.getItem() instanceof AutocannonCartridgeItem) {
+			try {
+				projectileStack = AutocannonCartridgeItem.getProjectileStack(firedStack);
+				if (projectileId.isEmpty() && !projectileStack.isEmpty()) {
+					ResourceLocation projectileItemId = BuiltInRegistries.ITEM.getKey(projectileStack.getItem());
+					projectileId = ItemProjectileRegistry.getProjectileId(projectileStack, registries)
+							.or(() -> ItemProjectileRegistry.getProjectileId(projectileItemId));
+				}
+			} catch (RuntimeException | LinkageError ex) {
+				GoingBallistic.LOGGER.debug("Could not read autocannon cartridge projectile stack from {}", itemId, ex);
+			}
+		}
+
+		ProjectileMassProperties projectileProperties = projectileId.flatMap(ProjectileMassRegistry::getProperties).orElse(null);
+		double projectileMassKg = 0.0D;
+		if (projectileProperties != null) {
+			ItemStack stackForMass = projectileStack.isEmpty() ? firedStack : projectileStack;
+			projectileMassKg = projectileProperties.fluidContainer() || projectileProperties.projectileContainer()
+					? getProjectileItemMassKg(stackForMass, registries, projectileProperties.massKg(), false, new HashSet<>())
+					: projectileProperties.massKg();
+		}
+
+		PropellantProperties propellant = PropellantRegistry.get(firedStack, registries)
+				.or(() -> PropellantRegistry.get(itemId))
+				.orElse(null);
+		Double powderMassKg = null;
+		Double chargeLengthMeters = null;
+		double velocityMultiplier = 1.0D;
+
+		if (propellant != null) {
+			if (propellant.kind() == PropellantProperties.PropellantKind.AUTOCANNON_CARTRIDGE || propellant.kind() == PropellantProperties.PropellantKind.MACHINE_GUN_ROUND) {
+				powderMassKg = propellant.hasPowderMassOverride()
+						? propellant.resolvedPowderMassKg()
+						: projectileProperties == null ? propellant.resolvedPowderMassKg() : projectileProperties.autocannonPowderMassKgOr(propellant.resolvedPowderMassKg());
+				chargeLengthMeters = propellant.hasChargeLengthOverride()
+						? propellant.resolvedChargeLengthMeters()
+						: projectileProperties == null ? propellant.resolvedChargeLengthMeters() : projectileProperties.autocannonChargeLengthMetersOr(propellant.resolvedChargeLengthMeters());
+				velocityMultiplier *= propellant.velocityMultiplier();
+			}
+		}
+
+		if (projectileMassKg <= 0.0D && powderMassKg == null) return null;
+		return new GoingBallisticShotData(projectileMassKg, powderMassKg, chargeLengthMeters, velocityMultiplier);
+	}
+
+	private static double tryReadContainedProjectileMass(ItemStack stack, HolderLookup.Provider registries, ProjectileMassProperties properties, boolean allowRecursiveContainers, Set<ResourceLocation> visitedProjectiles) {
+		try {
+			CustomData customData = stack.getOrDefault(net.minecraft.core.component.DataComponents.CUSTOM_DATA, CustomData.EMPTY);
+			CompoundTag tag = customData.copyTag();
+			ListTag childList = getCompoundListAtPath(tag, properties.childItemListPath());
+			if (childList == null || childList.isEmpty()) return 0.0D;
+			double childMass = 0.0D;
+			int maxChildren = properties.maxContainedProjectiles() > 0 ? properties.maxContainedProjectiles() : childList.size();
+			for (int i = 0; i < childList.size() && i < maxChildren; ++i) {
+				ItemStack childStack = parseItemStack(registries, childList.getCompound(i));
+				childMass += childStack.isEmpty()
+						? properties.childFallbackMassKg()
+						: getProjectileItemMassKg(childStack, registries, properties.childFallbackMassKg(), allowRecursiveContainers, visitedProjectiles);
+			}
+			return childMass;
+		} catch (RuntimeException | LinkageError ex) {
+			GoingBallistic.LOGGER.debug("Could not read contained projectile mass from item stack {}", stack, ex);
+			return 0.0D;
+		}
+	}
+
+	private static ListTag getCompoundListAtPath(CompoundTag root, String path) {
+		if (root == null || path == null || path.isBlank()) return null;
+		CompoundTag current = root;
+		String[] parts = path.split("\\.");
+		for (int i = 0; i < parts.length; ++i) {
+			String part = parts[i];
+			if (part.isBlank()) continue;
+			if (i == parts.length - 1) {
+				return current.contains(part, Tag.TAG_LIST) ? current.getList(part, Tag.TAG_COMPOUND) : null;
+			}
+			if (!current.contains(part, Tag.TAG_COMPOUND)) return null;
+			current = current.getCompound(part);
+		}
+		return null;
+	}
+
+	private static ItemStack parseItemStack(HolderLookup.Provider registries, CompoundTag tag) {
+		if (tag == null || tag.isEmpty() || registries == null) return ItemStack.EMPTY;
+		ItemStack direct = ItemStack.parseOptional(registries, tag);
+		if (!direct.isEmpty()) return direct;
+		for (String nestedKey : new String[] { "Item", "item", "Stack", "stack" }) {
+			if (tag.contains(nestedKey, Tag.TAG_COMPOUND)) {
+				ItemStack nested = ItemStack.parseOptional(registries, tag.getCompound(nestedKey));
+				if (!nested.isEmpty()) return nested;
+			}
+		}
+		return ItemStack.EMPTY;
+	}
+
+	private static FluidPayload tryReadFluidPayloadFromItemStack(ItemStack stack, HolderLookup.Provider registries) {
+		try {
+			CustomData data = stack.getOrDefault(CBCDataComponents.FLUID_CONTENT, CustomData.EMPTY);
+			if (data.isEmpty() || registries == null) return new FluidPayload(0.0D, 1000.0D);
+			FluidTank tank = new FluidTank((int) DEFAULT_FLUID_CONTAINER_CAPACITY_MB);
+			tank.readFromNBT(registries, data.copyTag());
+			FluidStack fluidStack = tank.getFluid();
+			if (fluidStack.isEmpty()) return new FluidPayload(0.0D, 1000.0D);
+			double fillFraction = Math.max(0.0D, Math.min(1.0D, fluidStack.getAmount() / DEFAULT_FLUID_CONTAINER_CAPACITY_MB));
+			double density = fluidStack.getFluid() == Fluids.EMPTY ? 1000.0D : fluidStack.getFluid().getFluidType().getDensity();
+			return new FluidPayload(fillFraction, density);
+		} catch (RuntimeException | LinkageError ex) {
+			GoingBallistic.LOGGER.debug("Could not read dynamic fluid payload from item stack {}", stack, ex);
+			return null;
+		}
 	}
 
 	private static FluidPayload tryReadFluidPayload(Entity projectile) {
@@ -290,6 +517,13 @@ public final class BallisticProjectileHelper {
 			}
 		}
 		return null;
+	}
+
+	public record BarrelProfile(double lengthMeters, double velocityMultiplier) {
+		public BarrelProfile {
+			if (!Double.isFinite(lengthMeters) || lengthMeters <= 0.0D) lengthMeters = MIN_BARREL_LENGTH_METERS;
+			if (!Double.isFinite(velocityMultiplier) || velocityMultiplier <= 0.0D) velocityMultiplier = 1.0D;
+		}
 	}
 
 	private record FluidPayload(double fillFraction, double fluidDensityKgPerM3) { }

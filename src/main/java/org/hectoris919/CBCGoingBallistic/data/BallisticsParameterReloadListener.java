@@ -56,6 +56,8 @@ public class BallisticsParameterReloadListener extends SimpleJsonResourceReloadL
 		int count = 0;
 		count += readPositive(json, fileId, "robins_constant_mps", builder::robinsConstantMps);
 		count += readPositive(json, fileId, "velocity_multiplier", builder::velocityMultiplier);
+		count += readPositive(json, fileId, "projectile_mass_fallback", builder::projectileMassFallback);
+		count += readPositive(json, fileId, "autocannon_projectile_mass_fallback", builder::autocannonProjectileMassFallback);
 		count += readPositive(json, fileId, "cannon_powder_mass", builder::cannonPowderMass);
 		count += readPositive(json, fileId, "cannon_charge_diameter", builder::cannonChargeDiameter);
 		count += readPositive(json, fileId, "cannon_charge_length", builder::cannonChargeLength);
@@ -63,15 +65,33 @@ public class BallisticsParameterReloadListener extends SimpleJsonResourceReloadL
 		count += readPositive(json, fileId, "autocannon_charge_diameter", builder::autocannonCartridgeDiameter);
 		count += readPositive(json, fileId, "autocannon_charge_length", builder::autocannonCartridgeLength);
 		count += readPositive(json, fileId, "black_powder_energy_j_per_kg", builder::blackPowderEnergyJoulesPerKg);
+		count += readPositive(json, fileId, "air_density", builder::airDensity);
+		count += readPositive(json, fileId, "projectile_drag_coefficient", builder::projectileDragCoefficient);
+		count += readPositive(json, fileId, "machine_gun_bullet_radius", builder::machineGunBulletRadius);
+		count += readPositive(json, fileId, "joules_per_toughness_point", builder::joulesPerToughnessPoint);
+		count += readPositive(json, fileId, "autocannon_joules_per_block_damage_point", builder::autocannonJoulesPerBlockDamagePoint);
+		count += readPositive(json, fileId, "machine_gun_joules_per_block_damage_point", builder::machineGunJoulesPerBlockDamagePoint);
+		count += readNonNegative(json, fileId, "min_hard_target_damage_factor", builder::minHardTargetDamageFactor);
+		count += readNonNegative(json, fileId, "ap_projectile_block_damage_multiplier", builder::apProjectileBlockDamageMultiplier);
+		count += readNonNegative(json, fileId, "small_arms_block_damage_multiplier", builder::smallArmsBlockDamageMultiplier);
 		return count;
 	}
 
 	private static int readPositive(JsonObject json, ResourceLocation fileId, String key, DoubleConsumer setter) {
+		return readNumber(json, fileId, key, true, setter);
+	}
+
+	private static int readNonNegative(JsonObject json, ResourceLocation fileId, String key, DoubleConsumer setter) {
+		return readNumber(json, fileId, key, false, setter);
+	}
+
+	private static int readNumber(JsonObject json, ResourceLocation fileId, String key, boolean strictlyPositive, DoubleConsumer setter) {
 		if (!json.has(key)) return 0;
 
 		double value = GsonHelper.getAsDouble(json, key);
-		if (!Double.isFinite(value) || value <= 0.0D) {
-			GoingBallistic.LOGGER.warn("Ignoring {}={} in {} because it must be positive and finite", key, value, fileId);
+		boolean invalid = !Double.isFinite(value) || (strictlyPositive ? value <= 0.0D : value < 0.0D);
+		if (invalid) {
+			GoingBallistic.LOGGER.warn("Ignoring {}={} in {} because it must be {} and finite", key, value, fileId, strictlyPositive ? "positive" : "non-negative");
 			return 0;
 		}
 		setter.accept(value);

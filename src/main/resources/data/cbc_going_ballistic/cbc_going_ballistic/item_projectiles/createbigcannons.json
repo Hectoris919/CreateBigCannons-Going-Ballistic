@@ -1,0 +1,17 @@
+{
+  "values": {
+    "createbigcannons:solid_shot": "createbigcannons:shot",
+    "createbigcannons:ap_shot": "createbigcannons:ap_shot",
+    "createbigcannons:mortar_stone": "createbigcannons:mortar_stone",
+    "createbigcannons:grapeshot": "createbigcannons:bag_of_grapeshot",
+    "createbigcannons:he_shell": "createbigcannons:he_shell",
+    "createbigcannons:ap_shell": "createbigcannons:ap_shell",
+    "createbigcannons:shrapnel_shell": "createbigcannons:shrapnel_shell",
+    "createbigcannons:fluid_shell": "createbigcannons:fluid_shell",
+    "createbigcannons:smoke_shell": "createbigcannons:smoke_shell",
+    "createbigcannons:drop_mortar_shell": "createbigcannons:drop_mortar_shell",
+    "createbigcannons:autocannon_cartridge{components:{\"createbigcannons:projectile\":[{item:{count:1,id:\"createbigcannons:flak_autocannon_round\"}]}}}": "createbigcannons:flak_autocannon",
+    "createbigcannons:autocannon_cartridge{components:{\"createbigcannons:projectile\":[{item:{count:1,id:\"createbigcannons:ap_autocannon_round\"}]}}}": "createbigcannons:ap_autocannon",
+    "createbigcannons:machine_gun_round": "createbigcannons:machine_gun_bullet"
+  }
+}

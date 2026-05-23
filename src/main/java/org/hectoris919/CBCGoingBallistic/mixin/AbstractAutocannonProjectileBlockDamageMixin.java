@@ -3,6 +3,7 @@ package org.hectoris919.CBCGoingBallistic.mixin;
 import org.hectoris919.CBCGoingBallistic.Config;
 import org.hectoris919.CBCGoingBallistic.ballistics.BallisticProjectileHelper;
 import org.hectoris919.CBCGoingBallistic.ballistics.BlockDamageMath;
+import org.hectoris919.CBCGoingBallistic.data.BallisticsParameterRegistry;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -48,7 +49,7 @@ public abstract class AbstractAutocannonProjectileBlockDamageMixin extends Abstr
 		Vec3 normal = CBCUtils.getSurfaceNormalVector(this.level(), blockHitResult);
 		double incidence = BlockDamageMath.incidence(curVel, normal);
 		double velocityMps = BlockDamageMath.velocityBlocksPerTickToMetersPerSecond(curVel.length());
-		double massKg = BallisticProjectileHelper.getProjectileMassKg(this, Config.autocannonProjectileMassFallback());
+		double massKg = BallisticProjectileHelper.getProjectileMassKg(this, BallisticsParameterRegistry.autocannonProjectileMassFallback());
 		double normalEnergyJ = BlockDamageMath.normalImpactEnergyJ(massKg, velocityMps, incidence);
 		double constructionMultiplier = BlockDamageMath.projectileConstructionMultiplier(this);
 		int damagePoints = BlockDamageMath.autocannonDamagePoints(this, normalEnergyJ, constructionMultiplier);

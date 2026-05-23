@@ -28,7 +28,7 @@ public abstract class MortarStoneProjectileMixin {
 		if (properties == null || properties.maxSafeChargeEquivalentsOptional().isEmpty()) return;
 
 		double chargeEquivalents = power / 2.0D;
-		this.tooManyCharges = chargeEquivalents > properties.maxSafeChargeEquivalentsOptional().getAsDouble();
+		this.tooManyCharges = Math.round(chargeEquivalents) > properties.maxSafeChargeEquivalentsOptional().getAsDouble();
 		ci.cancel();
 	}
 }

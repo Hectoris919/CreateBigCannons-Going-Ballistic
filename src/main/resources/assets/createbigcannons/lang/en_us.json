@@ -1,5 +1,5 @@
 {
-  "block.createbigcannons.mortar_stone.tooltip.maximumCharges": "Safe Firing Limit",
-  "block.createbigcannons.mortar_stone.tooltip.maximumCharges.value": "Going Ballistic uses a charge-equivalent limit for this projectile instead of CBC's legacy muzzle-speed limit.",
-  "block.createbigcannons.mortar_stone.tooltip.summary": "Powerful stone that _explodes on impact._ _Flies further_ than other projectiles.\nGood for attacking _walls and fortifications._ _Cannot be fuzed and detonated._ Will _break_ if fired with too much propellant."
+  "block.createbigcannons.mortar_stone.tooltip.maximumCharges": "Maximum Firing Force",
+  "block.createbigcannons.mortar_stone.tooltip.maximumCharges.value": "This mortar stone can be fired with a maximum of _3_ powder charges",
+  "block.createbigcannons.mortar_stone.tooltip.summary": "Powerful stone that _explodes on impact._ _Flies further_ than other projectiles. Good for attacking _walls and fortifications._ _Cannot be fuzed and detonated._ Will _break_ if fired with too much propellant."
 }

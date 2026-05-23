@@ -1,0 +1,59 @@
+{
+  "values": {
+    "cbc_at:cast_iron_rifled_barrel": {
+      "length_m": 1.0,
+      "velocity_multiplier": 0.985
+    },
+    "cbc_at:bronze_rifled_barrel": {
+      "length_m": 1.0,
+      "velocity_multiplier": 0.985
+    },
+    "cbc_at:steel_rifled_barrel": {
+      "length_m": 1.0,
+      "velocity_multiplier": 0.985
+    },
+    "cbc_at:nethersteel_rifled_barrel": {
+      "length_m": 1.0,
+      "velocity_multiplier": 0.985
+    },
+
+    "cbc_at:cast_iron_twin_autocannon_barrel": {
+      "length_m": 1.0,
+      "velocity_multiplier": 1.0
+    },
+    "cbc_at:cast_iron_vert_twin_autocannon_barrel": {
+      "length_m": 1.0,
+      "velocity_multiplier": 1.0
+    },
+    "cbc_at:cast_iron_heavy_autocannon_barrel": {
+      "length_m": 1.0,
+      "velocity_multiplier": 1.0
+    },
+
+    "cbc_at:bronze_twin_autocannon_barrel": {
+      "length_m": 1.0,
+      "velocity_multiplier": 1.0
+    },
+    "cbc_at:bronze_vert_twin_autocannon_barrel": {
+      "length_m": 1.0,
+      "velocity_multiplier": 1.0
+    },
+    "cbc_at:bronze_heavy_autocannon_barrel": {
+      "length_m": 1.0,
+      "velocity_multiplier": 1.0
+    },
+
+    "cbc_at:steel_twin_autocannon_barrel": {
+      "length_m": 1.0,
+      "velocity_multiplier": 1.0
+    },
+    "cbc_at:steel_vert_twin_autocannon_barrel": {
+      "length_m": 1.0,
+      "velocity_multiplier": 1.0
+    },
+    "cbc_at:steel_heavy_autocannon_barrel": {
+      "length_m": 1.0,
+      "velocity_multiplier": 1.0
+    }
+  }
+}
