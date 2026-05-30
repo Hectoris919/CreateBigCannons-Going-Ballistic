@@ -128,7 +128,17 @@ public abstract class AbstractCannonProjectileBlockDamageMixin extends AbstractC
 					: normal.reverse();
 			Vec3 spallLoc = hitLoc.add(spallDirection.scale(2.0D));
 			if (!this.level().isClientSide) {
-				ImpactExplosion explosion = new ImpactExplosion(this.level(), this, this.indirectArtilleryFire(false), spallLoc.x, spallLoc.y, spallLoc.z, 2.0F, Explosion.BlockInteraction.KEEP);
+				ImpactExplosion explosion = new ImpactExplosion(
+						this.level(),
+						this,
+						this.indirectArtilleryFire(false),
+						spallLoc.x,
+						spallLoc.y,
+						spallLoc.z,
+						2.0F,
+						2.0F,
+						Explosion.BlockInteraction.KEEP
+				);
 				CreateBigCannons.handleCustomExplosion(this.level(), explosion);
 			}
 			SoundType sound = state.getSoundType();
