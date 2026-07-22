@@ -1,6 +1,6 @@
 package org.hectoris919.CBCGoingBallistic.client;
 
-import net.createmod.ponder.foundation.PonderIndex;
+//import net.createmod.ponder.foundation.PonderIndex;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -12,5 +12,8 @@ public final class GoingBallisticPonderClient {
 	private GoingBallisticPonderClient() { }
 
 	@SubscribeEvent
-	public static void onClientSetup(FMLClientSetupEvent event) { PonderIndex.addPlugin(new GoingBallisticPonderPlugin()); }
+	public static void onClientSetup(FMLClientSetupEvent event) {
+		// Remove until scene is fully animated
+//		PonderIndex.addPlugin(new GoingBallisticPonderPlugin());
+	}
 }
