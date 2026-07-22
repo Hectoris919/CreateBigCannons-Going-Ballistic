@@ -1,13 +1,17 @@
 package org.hectoris919.CBCGoingBallistic.mixin;
 
+import net.minecraft.server.level.ServerLevel;
 import org.hectoris919.CBCGoingBallistic.Config;
 import org.hectoris919.CBCGoingBallistic.ballistics.BallisticProjectileHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import rbasamoyai.createbigcannons.cannon_control.contraption.AbstractMountedCannonContraption;
 import rbasamoyai.createbigcannons.cannon_control.contraption.MountedBigCannonContraption;
+import rbasamoyai.createbigcannons.cannon_control.contraption.PitchOrientedContraptionEntity;
 import rbasamoyai.createbigcannons.cannons.big_cannons.material.BigCannonMaterialProperties;
 import rbasamoyai.createbigcannons.munitions.big_cannon.AbstractBigCannonProjectile;
 
@@ -15,6 +19,27 @@ import rbasamoyai.createbigcannons.munitions.big_cannon.AbstractBigCannonProject
 public abstract class MountedCannonContraptionMixin {
 	@Unique
 	private AbstractBigCannonProjectile goingballistic$currentProjectile;
+
+	@Inject(method = "fireShot", at = @At("HEAD"))
+	private void goingballistic$beginPropellantCapture(ServerLevel level, PitchOrientedContraptionEntity entity, CallbackInfo ci) {
+		BallisticProjectileHelper.beginBigCannonShot(level.registryAccess());
+	}
+
+	@Inject(method = "fireShot", at = @At("RETURN"))
+	private void goingballistic$endPropellantCapture(ServerLevel level, PitchOrientedContraptionEntity entity, CallbackInfo ci) {
+		BallisticProjectileHelper.endBigCannonShot();
+	}
+
+	@Inject(
+			method = "fireShot",
+			at = @At(
+					value = "INVOKE",
+					target = "Lrbasamoyai/createbigcannons/cannon_control/ControlPitchContraption;onRecoil(Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/phys/Vec3;Lcom/simibubi/create/content/contraptions/AbstractContraptionEntity;)V"
+			)
+	)
+	private void goingballistic$finalizeRecoilTransaction(ServerLevel level, PitchOrientedContraptionEntity entity, CallbackInfo ci) {
+		BallisticProjectileHelper.finalizeBigCannonRecoil();
+	}
 
 	@Redirect(
 			method = "fireShot",

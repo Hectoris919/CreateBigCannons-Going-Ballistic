@@ -31,17 +31,19 @@ public final class BallisticsParameterRegistry {
 	public static double airDensity() { return value(overrides.airDensity, 1.225D); }
 	public static double projectileDragCoefficient() { return value(overrides.projectileDragCoefficient, 0.47D); }
 	public static double machineGunBulletRadius() { return value(overrides.machineGunBulletRadius, (0.00782D / 2.0D) * Math.cbrt(0.012D / 0.00945D)); }
-	public static double joulesPerToughnessPoint() { return value(overrides.joulesPerToughnessPoint, 2000000.0D); }
-	public static double autocannonJoulesPerBlockDamagePoint() { return value(overrides.autocannonJoulesPerBlockDamagePoint, 25000.0D); }
-	public static double machineGunJoulesPerBlockDamagePoint() { return value(overrides.machineGunJoulesPerBlockDamagePoint, 12000.0D); }
-	public static double minHardTargetDamageFactor() { return value(overrides.minHardTargetDamageFactor, 0.05D); }
-	public static double apProjectileBlockDamageMultiplier() { return value(overrides.apProjectileBlockDamageMultiplier, 1.75D); }
-	public static double smallArmsBlockDamageMultiplier() { return value(overrides.smallArmsBlockDamageMultiplier, 0.35D); }
+	public static double joulesPerToughnessPoint() { return value(overrides.joulesPerToughnessPoint, 8000000.0D); }
+	public static double kilogramsPerSableMassUnit() { return value(overrides.kilogramsPerSableMassUnit, 7850.0D / 4.0D); }
+	public static double sableRecoilGasVelocityMultiplier() { return value(overrides.sableRecoilGasVelocityMultiplier, 1.2D); }
+	public static double sableBlankGasVelocityMps() { return value(overrides.sableBlankGasVelocityMps, 400.0D); }
+	public static double sableBlankGasImpulseEfficiency() { return value(overrides.sableBlankGasImpulseEfficiency, 0.35D); }
+	public static double sableRecoilImpulseScale() { return value(overrides.sableRecoilImpulseScale, 1.0D); }
+	public static double sableImpactImpulseScale() { return value(overrides.sableImpactImpulseScale, 1.0D); }
 
 	private static double value(Double override, double fallback) { return override != null ? override : fallback; }
 
 	public static final class Overrides {
 		public static final Overrides EMPTY = new Overrides(
+				null,
 				null,
 				null,
 				null,
@@ -79,11 +81,12 @@ public final class BallisticsParameterRegistry {
 		private final Double projectileDragCoefficient;
 		private final Double machineGunBulletRadius;
 		private final Double joulesPerToughnessPoint;
-		private final Double autocannonJoulesPerBlockDamagePoint;
-		private final Double machineGunJoulesPerBlockDamagePoint;
-		private final Double minHardTargetDamageFactor;
-		private final Double apProjectileBlockDamageMultiplier;
-		private final Double smallArmsBlockDamageMultiplier;
+		private final Double kilogramsPerSableMassUnit;
+		private final Double sableRecoilGasVelocityMultiplier;
+		private final Double sableBlankGasVelocityMps;
+		private final Double sableBlankGasImpulseEfficiency;
+		private final Double sableRecoilImpulseScale;
+		private final Double sableImpactImpulseScale;
 
 		public Overrides(
 				Double robinsConstantMps,
@@ -101,11 +104,12 @@ public final class BallisticsParameterRegistry {
 				Double projectileDragCoefficient,
 				Double machineGunBulletRadius,
 				Double joulesPerToughnessPoint,
-				Double autocannonJoulesPerBlockDamagePoint,
-				Double machineGunJoulesPerBlockDamagePoint,
-				Double minHardTargetDamageFactor,
-				Double apProjectileBlockDamageMultiplier,
-				Double smallArmsBlockDamageMultiplier
+				Double kilogramsPerSableMassUnit,
+				Double sableRecoilGasVelocityMultiplier,
+				Double sableBlankGasVelocityMps,
+				Double sableBlankGasImpulseEfficiency,
+				Double sableRecoilImpulseScale,
+				Double sableImpactImpulseScale
 		) {
 			this.robinsConstantMps = robinsConstantMps;
 			this.velocityMultiplier = velocityMultiplier;
@@ -122,11 +126,12 @@ public final class BallisticsParameterRegistry {
 			this.projectileDragCoefficient = projectileDragCoefficient;
 			this.machineGunBulletRadius = machineGunBulletRadius;
 			this.joulesPerToughnessPoint = joulesPerToughnessPoint;
-			this.autocannonJoulesPerBlockDamagePoint = autocannonJoulesPerBlockDamagePoint;
-			this.machineGunJoulesPerBlockDamagePoint = machineGunJoulesPerBlockDamagePoint;
-			this.minHardTargetDamageFactor = minHardTargetDamageFactor;
-			this.apProjectileBlockDamageMultiplier = apProjectileBlockDamageMultiplier;
-			this.smallArmsBlockDamageMultiplier = smallArmsBlockDamageMultiplier;
+			this.kilogramsPerSableMassUnit = kilogramsPerSableMassUnit;
+			this.sableRecoilGasVelocityMultiplier = sableRecoilGasVelocityMultiplier;
+			this.sableBlankGasVelocityMps = sableBlankGasVelocityMps;
+			this.sableBlankGasImpulseEfficiency = sableBlankGasImpulseEfficiency;
+			this.sableRecoilImpulseScale = sableRecoilImpulseScale;
+			this.sableImpactImpulseScale = sableImpactImpulseScale;
 		}
 
 		public boolean isEmpty() {
@@ -145,11 +150,12 @@ public final class BallisticsParameterRegistry {
 					&& this.projectileDragCoefficient == null
 					&& this.machineGunBulletRadius == null
 					&& this.joulesPerToughnessPoint == null
-					&& this.autocannonJoulesPerBlockDamagePoint == null
-					&& this.machineGunJoulesPerBlockDamagePoint == null
-					&& this.minHardTargetDamageFactor == null
-					&& this.apProjectileBlockDamageMultiplier == null
-					&& this.smallArmsBlockDamageMultiplier == null;
+					&& this.kilogramsPerSableMassUnit == null
+					&& this.sableRecoilGasVelocityMultiplier == null
+					&& this.sableBlankGasVelocityMps == null
+					&& this.sableBlankGasImpulseEfficiency == null
+					&& this.sableRecoilImpulseScale == null
+					&& this.sableImpactImpulseScale == null;
 		}
 	}
 
@@ -169,11 +175,12 @@ public final class BallisticsParameterRegistry {
 		private Double projectileDragCoefficient;
 		private Double machineGunBulletRadius;
 		private Double joulesPerToughnessPoint;
-		private Double autocannonJoulesPerBlockDamagePoint;
-		private Double machineGunJoulesPerBlockDamagePoint;
-		private Double minHardTargetDamageFactor;
-		private Double apProjectileBlockDamageMultiplier;
-		private Double smallArmsBlockDamageMultiplier;
+		private Double kilogramsPerSableMassUnit;
+		private Double sableRecoilGasVelocityMultiplier;
+		private Double sableBlankGasVelocityMps;
+		private Double sableBlankGasImpulseEfficiency;
+		private Double sableRecoilImpulseScale;
+		private Double sableImpactImpulseScale;
 
 		void robinsConstantMps(double value) { this.robinsConstantMps = value; }
 		void velocityMultiplier(double value) { this.velocityMultiplier = value; }
@@ -190,11 +197,12 @@ public final class BallisticsParameterRegistry {
 		void projectileDragCoefficient(double value) { this.projectileDragCoefficient = value; }
 		void machineGunBulletRadius(double value) { this.machineGunBulletRadius = value; }
 		void joulesPerToughnessPoint(double value) { this.joulesPerToughnessPoint = value; }
-		void autocannonJoulesPerBlockDamagePoint(double value) { this.autocannonJoulesPerBlockDamagePoint = value; }
-		void machineGunJoulesPerBlockDamagePoint(double value) { this.machineGunJoulesPerBlockDamagePoint = value; }
-		void minHardTargetDamageFactor(double value) { this.minHardTargetDamageFactor = value; }
-		void apProjectileBlockDamageMultiplier(double value) { this.apProjectileBlockDamageMultiplier = value; }
-		void smallArmsBlockDamageMultiplier(double value) { this.smallArmsBlockDamageMultiplier = value; }
+		void kilogramsPerSableMassUnit(double value) { this.kilogramsPerSableMassUnit = value; }
+		void sableRecoilGasVelocityMultiplier(double value) { this.sableRecoilGasVelocityMultiplier = value; }
+		void sableBlankGasVelocityMps(double value) { this.sableBlankGasVelocityMps = value; }
+		void sableBlankGasImpulseEfficiency(double value) { this.sableBlankGasImpulseEfficiency = value; }
+		void sableRecoilImpulseScale(double value) { this.sableRecoilImpulseScale = value; }
+		void sableImpactImpulseScale(double value) { this.sableImpactImpulseScale = value; }
 
 		Overrides build() {
 			return new Overrides(
@@ -213,11 +221,12 @@ public final class BallisticsParameterRegistry {
 					this.projectileDragCoefficient,
 					this.machineGunBulletRadius,
 					this.joulesPerToughnessPoint,
-					this.autocannonJoulesPerBlockDamagePoint,
-					this.machineGunJoulesPerBlockDamagePoint,
-					this.minHardTargetDamageFactor,
-					this.apProjectileBlockDamageMultiplier,
-					this.smallArmsBlockDamageMultiplier
+					this.kilogramsPerSableMassUnit,
+					this.sableRecoilGasVelocityMultiplier,
+					this.sableBlankGasVelocityMps,
+					this.sableBlankGasImpulseEfficiency,
+					this.sableRecoilImpulseScale,
+					this.sableImpactImpulseScale
 			);
 		}
 	}

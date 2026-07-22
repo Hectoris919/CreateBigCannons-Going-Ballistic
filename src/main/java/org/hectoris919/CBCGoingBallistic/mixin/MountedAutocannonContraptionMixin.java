@@ -5,7 +5,9 @@ import net.minecraft.world.level.Level;
 import org.hectoris919.CBCGoingBallistic.ballistics.BallisticProjectileHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import rbasamoyai.createbigcannons.cannon_control.contraption.AbstractMountedCannonContraption;
 import rbasamoyai.createbigcannons.cannon_control.contraption.MountedAutocannonContraption;
 import rbasamoyai.createbigcannons.munitions.autocannon.AbstractAutocannonProjectile;
@@ -13,6 +15,16 @@ import rbasamoyai.createbigcannons.munitions.autocannon.AutocannonAmmoItem;
 
 @Mixin(MountedAutocannonContraption.class)
 public abstract class MountedAutocannonContraptionMixin {
+	@Inject(method = "fireShot", at = @At("HEAD"))
+	private void goingballistic$beginAutocannonShot(CallbackInfo ci) {
+		BallisticProjectileHelper.beginAutocannonShot();
+	}
+
+	@Inject(method = "fireShot", at = @At("RETURN"))
+	private void goingballistic$endAutocannonShot(CallbackInfo ci) {
+		BallisticProjectileHelper.endAutocannonShot();
+	}
+
 	@Redirect(
 			method = "fireShot",
 			at = @At(

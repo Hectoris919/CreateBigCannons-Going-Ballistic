@@ -69,12 +69,31 @@ public class BallisticsParameterReloadListener extends SimpleJsonResourceReloadL
 		count += readPositive(json, fileId, "projectile_drag_coefficient", builder::projectileDragCoefficient);
 		count += readPositive(json, fileId, "machine_gun_bullet_radius", builder::machineGunBulletRadius);
 		count += readPositive(json, fileId, "joules_per_toughness_point", builder::joulesPerToughnessPoint);
-		count += readPositive(json, fileId, "autocannon_joules_per_block_damage_point", builder::autocannonJoulesPerBlockDamagePoint);
-		count += readPositive(json, fileId, "machine_gun_joules_per_block_damage_point", builder::machineGunJoulesPerBlockDamagePoint);
-		count += readNonNegative(json, fileId, "min_hard_target_damage_factor", builder::minHardTargetDamageFactor);
-		count += readNonNegative(json, fileId, "ap_projectile_block_damage_multiplier", builder::apProjectileBlockDamageMultiplier);
-		count += readNonNegative(json, fileId, "small_arms_block_damage_multiplier", builder::smallArmsBlockDamageMultiplier);
+		count += readPositive(json, fileId, "kilograms_per_sable_mass_unit", builder::kilogramsPerSableMassUnit);
+		count += readNonNegative(json, fileId, "sable_recoil_gas_velocity_multiplier", builder::sableRecoilGasVelocityMultiplier);
+		count += readNonNegative(json, fileId, "sable_blank_gas_velocity_mps", builder::sableBlankGasVelocityMps);
+		count += readNonNegative(json, fileId, "sable_blank_gas_impulse_efficiency", builder::sableBlankGasImpulseEfficiency);
+		count += readNonNegative(json, fileId, "sable_recoil_impulse_scale", builder::sableRecoilImpulseScale);
+		count += readNonNegative(json, fileId, "sable_impact_impulse_scale", builder::sableImpactImpulseScale);
+		warnDeprecatedParameter(json, fileId, "autocannon_joules_per_block_damage_point");
+		warnDeprecatedParameter(json, fileId, "machine_gun_joules_per_block_damage_point");
+		warnDeprecatedParameter(json, fileId, "min_hard_target_damage_factor");
+		warnDeprecatedParameter(json, fileId, "ap_projectile_block_damage_multiplier");
+		warnDeprecatedParameter(json, fileId, "small_arms_block_damage_multiplier");
+		warnDeprecatedSableForceDuration(json, fileId);
 		return count;
+	}
+
+	private static void warnDeprecatedSableForceDuration(JsonObject json, ResourceLocation fileId) {
+		if (json.has("sable_force_duration_seconds")) {
+			GoingBallistic.LOGGER.warn("Ignoring deprecated Going Ballistic parameter sable_force_duration_seconds in {}; Sable's queued point-force API applies the supplied vector directly as an impulse", fileId);
+		}
+	}
+
+	private static void warnDeprecatedParameter(JsonObject json, ResourceLocation fileId, String key) {
+		if (json.has(key)) {
+			GoingBallistic.LOGGER.warn("Ignoring deprecated Going Ballistic parameter {} in {}; realistic block damage now uses only joules_per_toughness_point", key, fileId);
+		}
 	}
 
 	private static int readPositive(JsonObject json, ResourceLocation fileId, String key, DoubleConsumer setter) {

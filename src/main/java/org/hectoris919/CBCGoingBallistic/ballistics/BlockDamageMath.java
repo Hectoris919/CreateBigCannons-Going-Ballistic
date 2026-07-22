@@ -8,6 +8,11 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 
 public final class BlockDamageMath {
+	private static final double MIN_EFFECTIVE_INCIDENCE = 0.2D;
+	private static final double BOUNCE_NORMAL_RESTITUTION = 0.7D;
+	private static final double CBC_PARTIAL_DAMAGE_POINTS_PER_TOUGHNESS = 10.0D;
+	private static final double AUTOCANNON_STRUCTURAL_COUPLING_EXPONENT = 1.0D / 3.0D;
+
 	private BlockDamageMath() { }
 
 	public static double velocityBlocksPerTickToMetersPerSecond(double velocityBlocksPerTick) { return velocityBlocksPerTick * BallisticsMath.TICKS_PER_SECOND; }
@@ -17,85 +22,133 @@ public final class BlockDamageMath {
 		return 0.5D * massKg * velocityMps * velocityMps;
 	}
 
-	public static double normalImpactEnergyJ(double massKg, double velocityMps, double incidence) {
-		double safeIncidence = finiteClamp(incidence);
-		return impactEnergyJ(massKg, velocityMps) * safeIncidence * safeIncidence;
-	}
-
-	public static double cannonDamageScore(double normalImpactEnergyJ, double constructionMultiplier) {
-		double joulesPerPoint = Math.max(BallisticsParameterRegistry.joulesPerToughnessPoint(), 1.0D);
-		return normalImpactEnergyJ / joulesPerPoint * safeMultiplier(constructionMultiplier);
-	}
-
-	public static int autocannonDamagePoints(Entity projectile, double normalImpactEnergyJ, double constructionMultiplier) {
-		double joulesPerPoint = isMachineGunProjectile(projectile)
-				? Math.max(BallisticsParameterRegistry.machineGunJoulesPerBlockDamagePoint(), 1.0D)
-				: Math.max(BallisticsParameterRegistry.autocannonJoulesPerBlockDamagePoint(), 1.0D);
-		double rawDamage = normalImpactEnergyJ / joulesPerPoint * safeMultiplier(constructionMultiplier);
-		int damage = (int) Math.ceil(Math.max(0.0D, rawDamage));
-		return Math.max(damage, 0);
-	}
-
-	public static double hardnessAttenuation(double hardnessPenalty, double projectileToughness) {
-		if (hardnessPenalty <= 1.0E-2D) return 1.0D;
-		if (projectileToughness <= 1.0E-2D) return 0.0D;
-
-		double min = Math.max(0.0D, Math.min(1.0D, BallisticsParameterRegistry.minHardTargetDamageFactor()));
-		return Math.max(min, 1.0D - hardnessPenalty / projectileToughness);
-	}
-
-	public static double projectileConstructionMultiplier(Entity projectile) {
-		String projectileId = String.valueOf(BallisticProjectileHelper.getProjectileId(projectile));
-		if (projectileId.contains("ap_autocannon") || projectileId.contains("ap_shot") || projectileId.contains("ap_shell") || projectileId.contains("armor_piercing")) return BallisticsParameterRegistry.apProjectileBlockDamageMultiplier();
-		if (projectileId.contains("flak") || projectileId.contains("machine_gun")) return BallisticsParameterRegistry.smallArmsBlockDamageMultiplier();
-		return 1.0D;
-	}
-
-	public static boolean isMachineGunProjectile(Entity projectile) {
-		String projectileId = String.valueOf(BallisticProjectileHelper.getProjectileId(projectile));
-		return projectileId.contains("machine_gun");
-	}
-
 	public static double incidence(Vec3 velocity, Vec3 surfaceNormal) {
 		if (velocity == null || surfaceNormal == null || velocity.lengthSqr() <= 1.0E-12D || surfaceNormal.lengthSqr() <= 1.0E-12D) {
 			return 0.0D;
 		}
-		return Math.max(0.0D, velocity.normalize().dot(surfaceNormal.reverse()));
+		return finiteUnitClamp(velocity.normalize().dot(surfaceNormal.reverse()));
 	}
 
-	public static void logCannonImpact(Entity projectile, double massKg, double velocityMps, double incidence, double normalEnergyJ, double damageScore, double toughness, boolean blockBroken) {
-		if (!Config.debugBallistics()) {
-			return;
+	public static double effectiveThicknessMultiplier(double incidence) {
+		return 1.0D / Math.max(finiteUnitClamp(incidence), MIN_EFFECTIVE_INCIDENCE);
+	}
+
+	public static double perforationWorkJ(double toughness, double incidence) {
+		if (!Double.isFinite(toughness) || toughness <= 0.0D) return 0.0D;
+		return toughness
+				* Math.max(BallisticsParameterRegistry.joulesPerToughnessPoint(), 1.0D)
+				* effectiveThicknessMultiplier(incidence);
+	}
+
+	public static double perforationScore(double impactEnergyJ, double incidence) {
+		if (!Double.isFinite(impactEnergyJ) || impactEnergyJ <= 0.0D) return 0.0D;
+		double workPerToughness = Math.max(BallisticsParameterRegistry.joulesPerToughnessPoint(), 1.0D)
+				* effectiveThicknessMultiplier(incidence);
+		return impactEnergyJ / workPerToughness;
+	}
+
+	public static Vec3 velocityAfterEnergyLoss(Vec3 velocityBlocksPerTick, double massKg, double energyLossJ) {
+		if (velocityBlocksPerTick == null) return Vec3.ZERO;
+		if (!Double.isFinite(massKg) || massKg <= 0.0D
+			|| !Double.isFinite(energyLossJ) || energyLossJ <= 0.0D
+			|| velocityBlocksPerTick.lengthSqr() <= 1.0E-12D) {
+			return velocityBlocksPerTick;
 		}
-		GoingBallistic.LOGGER.info(
-				"[Going Ballistic] Big cannon impact: projectile={}, mass={} kg, velocity={} m/s, incidence={}, normalEnergy={} J, damageScore={}, toughness={}, blockBroken={}",
-				BallisticProjectileHelper.getProjectileId(projectile),
-				massKg,
-				velocityMps,
-				incidence,
-				normalEnergyJ,
-				damageScore,
-				toughness,
-				blockBroken
-		);
+
+		double velocityMps = velocityBlocksPerTickToMetersPerSecond(velocityBlocksPerTick.length());
+		double initialEnergyJ = impactEnergyJ(massKg, velocityMps);
+		if (initialEnergyJ <= 0.0D || energyLossJ >= initialEnergyJ) return Vec3.ZERO;
+
+		double remainingEnergyJ = initialEnergyJ - energyLossJ;
+		double velocityScale = Math.sqrt(remainingEnergyJ / initialEnergyJ);
+		return velocityBlocksPerTick.scale(velocityScale);
 	}
 
-	public static void logAutocannonImpact(Entity projectile, double massKg, double velocityMps, double incidence, double normalEnergyJ, int damagePoints, double hardnessPenalty, double attenuation) {
+	public static double bounceDepositedEnergyJ(double impactEnergyJ, double incidence) {
+		if (!Double.isFinite(impactEnergyJ) || impactEnergyJ <= 0.0D) return 0.0D;
+		double normalEnergyFraction = Math.pow(finiteUnitClamp(incidence), 2.0D);
+		double lostNormalFraction = 1.0D - BOUNCE_NORMAL_RESTITUTION * BOUNCE_NORMAL_RESTITUTION;
+		return impactEnergyJ * normalEnergyFraction * lostNormalFraction;
+	}
+
+	public static double partialDamagePoints(double depositedEnergyJ, double requiredPerforationWorkJ, double toughness) {
+		if (!Double.isFinite(depositedEnergyJ) || depositedEnergyJ <= 0.0D
+				|| !Double.isFinite(requiredPerforationWorkJ) || requiredPerforationWorkJ <= 0.0D
+				|| !Double.isFinite(toughness) || toughness <= 0.0D) {
+			return 0.0D;
+		}
+		double workFraction = Math.min(depositedEnergyJ / requiredPerforationWorkJ, 1.0D);
+		return CBC_PARTIAL_DAMAGE_POINTS_PER_TOUGHNESS * toughness * workFraction;
+	}
+
+	public static void logCannonImpact(
+			Entity projectile,
+			double massKg,
+			double velocityMps,
+			double incidence,
+			double impactEnergyJ,
+			double requiredWorkJ,
+			double depositedEnergyJ,
+			double damageScore,
+			double partialDamagePoints,
+			double toughness,
+			String outcome
+	) {
 		if (!Config.debugBallistics()) return;
 		GoingBallistic.LOGGER.info(
-				"[Going Ballistic] Autocannon impact: projectile={}, mass={} kg, velocity={} m/s, incidence={}, normalEnergy={} J, blockDamage={}, hardnessPenalty={}, hardnessAttenuation={}",
+				"[Going Ballistic] Big cannon impact: projectile={}, mass={} kg, velocity={} m/s, incidence={}, impactEnergy={} J, requiredWork={} J, depositedEnergy={} J, perforationScore={}, partialDamage={}, toughness={}, outcome={}",
 				BallisticProjectileHelper.getProjectileId(projectile),
 				massKg,
 				velocityMps,
 				incidence,
-				normalEnergyJ,
-				damagePoints,
-				hardnessPenalty,
-				attenuation
+				impactEnergyJ,
+				requiredWorkJ,
+				depositedEnergyJ,
+				damageScore,
+				partialDamagePoints,
+				toughness,
+				outcome
 		);
 	}
 
-	private static double safeMultiplier(double value) { return Double.isFinite(value) && value > 0.0D ? value : 1.0D; }
+	public static void logAutocannonImpact(
+			Entity projectile,
+			double massKg,
+			double velocityMps,
+			double incidence,
+			double impactEnergyJ,
+			double requiredWorkJ,
+			double depositedEnergyJ,
+			double structuralCoupling,
+			double structurallyCoupledEnergyJ,
+			double damagePoints,
+			double hardnessPenalty,
+			String outcome
+	) {
+		if (!Config.debugBallistics()) return;
+		GoingBallistic.LOGGER.info(
+				"[Going Ballistic] Autocannon impact: projectile={}, mass={} kg, velocity={} m/s, incidence={}, impactEnergy={} J, requiredWork={} J, depositedEnergy={} J, structuralCoupling={}, structurallyCoupledEnergy={} J, blockDamage={}, hardnessPenalty={}, outcome={}",
+				BallisticProjectileHelper.getProjectileId(projectile),
+				massKg,
+				velocityMps,
+				incidence,
+				impactEnergyJ,
+				requiredWorkJ,
+				depositedEnergyJ,
+				structuralCoupling,
+				structurallyCoupledEnergyJ,
+				damagePoints,
+				hardnessPenalty,
+				outcome
+		);
+	}
 
-	private static double finiteClamp(double value) { return !Double.isFinite(value) ? 0.0D : Math.max(0.0D, Math.min(1.0D, value)); }
+	public static double autocannonStructuralDamageCoupling(double massKg) {
+		if (!Double.isFinite(massKg) || massKg <= 0.0D) return 0.0D;
+		double referenceMassKg = Math.max(BallisticsParameterRegistry.projectileMassFallback(), 1.0E-9D);
+		double massRatio = Math.min(massKg / referenceMassKg, 1.0D);
+		return Math.pow(massRatio, AUTOCANNON_STRUCTURAL_COUPLING_EXPONENT);
+	}
+	
+	private static double finiteUnitClamp(double value) { return !Double.isFinite(value) ? 0.0D : Math.max(0.0D, Math.min(1.0D, value)); }
 }

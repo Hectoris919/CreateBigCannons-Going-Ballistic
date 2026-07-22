@@ -4,7 +4,7 @@
     "velocity_multiplier": 1.0,
     "projectile_mass_fallback": 3519.5,
     "autocannon_projectile_mass_fallback": 33.0,
-    "cannon_powder_mass": 121.593455168150,
+    "cannon_powder_mass": 121.59345516815,
     "cannon_charge_diameter": 0.754441738242,
     "cannon_charge_length": 1.0,
     "autocannon_powder_mass": 22.798772844028,
@@ -14,11 +14,10 @@
     "air_density": 1.225,
     "projectile_drag_coefficient": 0.47,
     "machine_gun_bullet_radius": 0.004236548901,
-    "joules_per_toughness_point": 2000000.0,
-    "autocannon_joules_per_block_damage_point": 25000.0,
-    "machine_gun_joules_per_block_damage_point": 12000.0,
-    "min_hard_target_damage_factor": 0.05,
-    "ap_projectile_block_damage_multiplier": 1.75,
-    "small_arms_block_damage_multiplier": 0.35
+    "joules_per_toughness_point": 8000000.0,
+    "kilograms_per_sable_mass_unit": 1962.5,
+    "sable_recoil_gas_velocity_multiplier": 1.2,
+    "sable_recoil_impulse_scale": 1.0,
+    "sable_impact_impulse_scale": 1.0
   }
 }

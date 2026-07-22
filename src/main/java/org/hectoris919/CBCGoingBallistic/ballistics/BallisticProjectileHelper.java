@@ -30,6 +30,7 @@ import org.hectoris919.CBCGoingBallistic.mixin.FluidShellProjectileAccessor;
 import rbasamoyai.createbigcannons.cannon_control.contraption.AbstractMountedCannonContraption;
 import rbasamoyai.createbigcannons.index.CBCDataComponents;
 import rbasamoyai.createbigcannons.munitions.big_cannon.fluid_shell.EndFluidStack;
+import rbasamoyai.createbigcannons.munitions.big_cannon.propellant.BigCannonPropellantBlock;
 import rbasamoyai.createbigcannons.munitions.autocannon.AutocannonCartridgeItem;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
@@ -50,27 +51,42 @@ public final class BallisticProjectileHelper {
 	private static final double DRY_BORE_SHOT_START_SHEAR_STRESS_PA = 10000000.0D;
 	private static final double SHOT_START_TRAVEL_METERS = 0.02D;
 
+	private static final ThreadLocal<BigCannonShotCapture> BIG_CANNON_SHOT_CAPTURE = new ThreadLocal<>();
+
 	private BallisticProjectileHelper() { }
 
 	public static float calculateCannonLaunchVelocityBlocksPerTick(Entity projectile, float cbcChargePower, AbstractMountedCannonContraption contraption) {
-		if (Config.disableRealisticBallistics()) return cbcChargePower;
-
 		double projectileMassKg = getProjectileMassKg(projectile);
+		CannonPropellantProfile propellantProfile = resolveCannonPropellantProfile(cbcChargePower);
 		BarrelProfile barrelProfile = estimateMountedBarrelProfile(contraption);
 		double barrelLengthMeters = barrelProfile.lengthMeters();
-		double velocityMps = BallisticsMath.getCannonVelocityFromChargePowerMps(projectileMassKg, cbcChargePower, barrelLengthMeters) * barrelProfile.velocityMultiplier();
-		float velocityBlocksPerTick = BallisticsMath.mpsToBPTFloat(velocityMps);
 
-		logCannonCalculation("launch", projectile, projectileMassKg, cbcChargePower, barrelLengthMeters, velocityMps, velocityBlocksPerTick);
+		double velocityMps;
+		float velocityBlocksPerTick;
+		if (Config.disableRealisticBallistics()) {
+			velocityBlocksPerTick = cbcChargePower;
+			velocityMps = Math.max(cbcChargePower, 0.0F) * BallisticsMath.TICKS_PER_SECOND;
+		} else {
+			velocityMps = BallisticsMath.getRobinsVelocityMps(
+					projectileMassKg,
+					propellantProfile.powderMassKg(),
+					propellantProfile.chargeLengthMeters(),
+					barrelLengthMeters,
+					propellantProfile.velocityMultiplier()
+			) * barrelProfile.velocityMultiplier();
+			velocityBlocksPerTick = BallisticsMath.mpsToBPTFloat(velocityMps);
+			if (velocityBlocksPerTick <= 0.0F) {
+				velocityBlocksPerTick = cbcChargePower;
+				velocityMps = Math.max(cbcChargePower, 0.0F) * BallisticsMath.TICKS_PER_SECOND;
+			}
+		}
 
-		return velocityBlocksPerTick > 0.0F
-				? velocityBlocksPerTick
-				: cbcChargePower;
+		SableImpulseMath.recordBigCannonProjectile(projectileMassKg, propellantProfile.powderMassKg(), velocityMps);
+		logCannonCalculation("launch", projectile, projectileMassKg, cbcChargePower, propellantProfile, barrelLengthMeters, velocityMps, velocityBlocksPerTick);
+		return velocityBlocksPerTick;
 	}
 
 	public static float calculateAutocannonLaunchVelocityBlocksPerTick(Entity projectile, float originalVelocity, AbstractMountedCannonContraption contraption) {
-		if (Config.disableRealisticBallistics()) return originalVelocity;
-
 		ProjectileMassProperties properties = getProjectileMassProperties(projectile);
 		GoingBallisticShotData shotData = getShotData(projectile);
 		double projectileMassKg = shotData == null
@@ -92,14 +108,23 @@ public final class BallisticProjectileHelper {
 			chargeLengthMeters = shotData.chargeLengthMetersOr(chargeLengthMeters);
 			localVelocityMultiplier *= shotData.velocityMultiplier();
 		}
-		double velocityMps = BallisticsMath.getRobinsVelocityMps(projectileMassKg, powderMassKg, chargeLengthMeters, barrelLengthMeters, localVelocityMultiplier) * barrelProfile.velocityMultiplier();
-		float velocityBlocksPerTick = BallisticsMath.mpsToBPTFloat(velocityMps);
+		double velocityMps;
+		float velocityBlocksPerTick;
+		if (Config.disableRealisticBallistics()) {
+			velocityBlocksPerTick = originalVelocity;
+			velocityMps = Math.max(originalVelocity, 0.0F) * BallisticsMath.TICKS_PER_SECOND;
+		} else {
+			velocityMps = BallisticsMath.getRobinsVelocityMps(projectileMassKg, powderMassKg, chargeLengthMeters, barrelLengthMeters, localVelocityMultiplier) * barrelProfile.velocityMultiplier();
+			velocityBlocksPerTick = BallisticsMath.mpsToBPTFloat(velocityMps);
+			if (velocityBlocksPerTick <= 0.0F) {
+				velocityBlocksPerTick = originalVelocity;
+				velocityMps = Math.max(originalVelocity, 0.0F) * BallisticsMath.TICKS_PER_SECOND;
+			}
+		}
 
+		SableImpulseMath.recordAndFinalizeAutocannonShot(projectileMassKg, powderMassKg, velocityMps);
 		logAutocannonCalculation(projectile, projectileMassKg, originalVelocity, powderMassKg, chargeLengthMeters, localVelocityMultiplier, barrelLengthMeters, velocityMps, velocityBlocksPerTick);
-
-		return velocityBlocksPerTick > 0.0F
-				? velocityBlocksPerTick
-				: originalVelocity;
+		return velocityBlocksPerTick;
 	}
 
 	public static boolean wouldCannonSquib(Entity projectile, float cbcChargePower, int barrelTravelled) {
@@ -107,13 +132,19 @@ public final class BallisticProjectileHelper {
 		if (projectile == null) return false;
 
 		double projectileMassKg = getProjectileMassKg(projectile);
-		double chargeEquivalent = cbcChargePower / 2.0D;
-		double powderMassKg = chargeEquivalent * BallisticsParameterRegistry.cannonPowderMass();
-		double chargeLengthMeters = chargeEquivalent * BallisticsParameterRegistry.cannonChargeLength();
+		CannonPropellantProfile propellantProfile = resolveCannonPropellantProfile(cbcChargePower);
+		double powderMassKg = propellantProfile.powderMassKg();
+		double chargeLengthMeters = propellantProfile.chargeLengthMeters();
 
 		double projectileTravelMeters = Math.max(barrelTravelled, 0.0D);
 		double finalGasColumnLengthMeters = chargeLengthMeters + projectileTravelMeters;
-		double idealVelocityMps = BallisticsMath.getRobinsVelocityMps(projectileMassKg, powderMassKg, chargeLengthMeters, finalGasColumnLengthMeters);
+		double idealVelocityMps = BallisticsMath.getRobinsVelocityMps(
+				projectileMassKg,
+				powderMassKg,
+				chargeLengthMeters,
+				finalGasColumnLengthMeters,
+				propellantProfile.velocityMultiplier()
+		);
 		double idealProjectileEnergyJ = kineticEnergyJ(projectileMassKg, idealVelocityMps);
 
 		double projectileDiameterMeters = BallisticsParameterRegistry.cannonChargeDiameter();
@@ -123,8 +154,100 @@ public final class BallisticProjectileHelper {
 		double requiredWorkJ = slidingWorkJ + shotStartWorkJ;
 
 		boolean squib = idealProjectileEnergyJ <= requiredWorkJ;
-		logCannonSquibCalculation(projectile, projectileMassKg, cbcChargePower, projectileTravelMeters, finalGasColumnLengthMeters, BallisticsParameterRegistry.cannonChargeDiameter(), idealVelocityMps, idealProjectileEnergyJ, slidingWorkJ, shotStartWorkJ, requiredWorkJ, squib);
+		logCannonSquibCalculation(projectile, projectileMassKg, cbcChargePower, propellantProfile, projectileTravelMeters, finalGasColumnLengthMeters, BallisticsParameterRegistry.cannonChargeDiameter(), idealVelocityMps, idealProjectileEnergyJ, slidingWorkJ, shotStartWorkJ, requiredWorkJ, squib);
 		return squib;
+	}
+
+	public static void beginBigCannonShot(HolderLookup.Provider registries) {
+		SableImpulseMath.beginBigCannonShot();
+		BIG_CANNON_SHOT_CAPTURE.set(new BigCannonShotCapture(registries));
+	}
+
+	public static void finalizeBigCannonRecoil() {
+		SableImpulseMath.finalizeBigCannonRecoil();
+	}
+
+	public static void endBigCannonShot() {
+		BIG_CANNON_SHOT_CAPTURE.remove();
+		SableImpulseMath.endShot();
+	}
+
+	public static void beginAutocannonShot() {
+		SableImpulseMath.beginAutocannonShot();
+	}
+
+	public static void endAutocannonShot() {
+		SableImpulseMath.endShot();
+	}
+
+	public static void captureBigCannonPropellant(BigCannonPropellantBlock propellant, StructureBlockInfo info, float cbcChargePower) {
+		BigCannonShotCapture capture = BIG_CANNON_SHOT_CAPTURE.get();
+		if (capture == null || capture.registries == null || propellant == null || info == null) return;
+		if (!Float.isFinite(cbcChargePower) || cbcChargePower <= 0.0F) return;
+
+		double recoilPowderMassKg = (cbcChargePower / 2.0D) * BallisticsParameterRegistry.cannonPowderMass();
+		double recoilVelocityMultiplier = 1.0D;
+
+		try {
+			ItemStack extractedStack = propellant.getExtractedItem(info, capture.registries);
+			if (extractedStack != null && !extractedStack.isEmpty()) {
+				ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(extractedStack.getItem());
+				PropellantProperties properties = PropellantRegistry.get(extractedStack, capture.registries)
+						.or(() -> PropellantRegistry.get(itemId))
+						.orElse(null);
+				if (properties != null
+						&& (properties.kind() == PropellantProperties.PropellantKind.BIG_CANNON_CHARGE
+						|| properties.kind() == PropellantProperties.PropellantKind.BIG_CANNON_CARTRIDGE)) {
+					double powderMassKg = properties.resolvedPowderMassKg();
+					double chargeLengthMeters = properties.resolvedChargeLengthMeters();
+					if (Double.isFinite(powderMassKg) && powderMassKg > 0.0D
+							&& Double.isFinite(chargeLengthMeters) && chargeLengthMeters > 0.0D) {
+						double velocityMultiplier = properties.velocityMultiplier();
+						recoilPowderMassKg = powderMassKg;
+						recoilVelocityMultiplier = velocityMultiplier;
+						capture.add(cbcChargePower, powderMassKg, chargeLengthMeters, velocityMultiplier);
+					}
+				}
+			}
+		} catch (RuntimeException | LinkageError ex) {
+			GoingBallistic.LOGGER.debug("Could not capture physical big-cannon propellant data", ex);
+		}
+
+		SableImpulseMath.recordBigCannonPropellant(recoilPowderMassKg, recoilVelocityMultiplier);
+	}
+
+	private static CannonPropellantProfile resolveCannonPropellantProfile(float cbcChargePower) {
+		double totalChargePower = Float.isFinite(cbcChargePower) ? Math.max(cbcChargePower, 0.0D) : 0.0D;
+		BigCannonShotCapture capture = BIG_CANNON_SHOT_CAPTURE.get();
+		if (capture == null || capture.capturedChargePower <= 0.0D || capture.powderMassKg <= 0.0D || capture.chargeLengthMeters <= 0.0D) {
+			double fallbackChargeEquivalent = totalChargePower / 2.0D;
+			return new CannonPropellantProfile(
+					fallbackChargeEquivalent * BallisticsParameterRegistry.cannonPowderMass(),
+					fallbackChargeEquivalent * BallisticsParameterRegistry.cannonChargeLength(),
+					1.0D,
+					0.0D,
+					fallbackChargeEquivalent
+			);
+		}
+
+		double capturedPowerScale = totalChargePower < capture.capturedChargePower
+				? totalChargePower / capture.capturedChargePower
+				: 1.0D;
+		double powderMassKg = capture.powderMassKg * Math.max(capturedPowerScale, 0.0D);
+		double chargeLengthMeters = capture.chargeLengthMeters;
+
+		double uncapturedChargePower = Math.max(totalChargePower - capture.capturedChargePower, 0.0D);
+		double fallbackChargeEquivalent = uncapturedChargePower / 2.0D;
+		powderMassKg += fallbackChargeEquivalent * BallisticsParameterRegistry.cannonPowderMass();
+		chargeLengthMeters += fallbackChargeEquivalent * BallisticsParameterRegistry.cannonChargeLength();
+
+		return new CannonPropellantProfile(
+				powderMassKg,
+				chargeLengthMeters,
+				capture.velocityMultiplier,
+				capture.capturedChargePower,
+				fallbackChargeEquivalent
+		);
 	}
 
 	public static GoingBallisticShotData getShotData(Entity projectile) {
@@ -431,8 +554,8 @@ public final class BallisticProjectileHelper {
 				Method fluidMethod = fluidStack.getClass().getMethod("fluid");
 				Object fluidValue = fluidMethod.invoke(fluidStack);
 				if (fluidValue instanceof Fluid fluid) density = fluid.getFluidType().getDensity();
-			} catch (ReflectiveOperationException ignored) {
-				GoingBallistic.LOGGER.error("ERROR: ", ignored);
+			} catch (ReflectiveOperationException except) {
+				GoingBallistic.LOGGER.error("ERROR: ", except);
 			}
 
 			return new FluidPayload(fillFraction, density);
@@ -442,22 +565,20 @@ public final class BallisticProjectileHelper {
 		}
 	}
 
-	private static void logCannonCalculation(String phase, Entity projectile, double projectileMassKg, float cbcChargePower, double barrelLengthMeters, double velocityMps, float velocityBlocksPerTick) {
+	private static void logCannonCalculation(String phase, Entity projectile, double projectileMassKg, float cbcChargePower, CannonPropellantProfile propellantProfile, double barrelLengthMeters, double velocityMps, float velocityBlocksPerTick) {
 		if (!Config.debugBallistics()) return;
 
-		double chargeEquivalent = cbcChargePower / 2.0D;
-		double powderMassKg = chargeEquivalent * BallisticsParameterRegistry.cannonPowderMass();
-		double chargeLengthMeters = chargeEquivalent * BallisticsParameterRegistry.cannonChargeLength();
-
 		GoingBallistic.LOGGER.info(
-				"[Going Ballistic] Cannon {}: projectile={}, mass={} kg, chargePower={}, chargeEquivalent={}, powderMass={} kg, chargeLength={} m, barrelLength={} m, velocity={} m/s, velocity={} blocks/tick",
+				"[Going Ballistic] Cannon {}: projectile={}, mass={} kg, chargePower={}, capturedChargePower={}, fallbackChargeEquivalent={}, powderMass={} kg, chargeLength={} m, propellantVelocityMultiplier={}, barrelLength={} m, velocity={} m/s, velocity={} blocks/tick",
 				phase,
 				getProjectileId(projectile),
 				projectileMassKg,
 				cbcChargePower,
-				chargeEquivalent,
-				powderMassKg,
-				chargeLengthMeters,
+				propellantProfile.capturedChargePower(),
+				propellantProfile.fallbackChargeEquivalent(),
+				propellantProfile.powderMassKg(),
+				propellantProfile.chargeLengthMeters(),
+				propellantProfile.velocityMultiplier(),
 				barrelLengthMeters,
 				velocityMps,
 				velocityBlocksPerTick
@@ -480,21 +601,32 @@ public final class BallisticProjectileHelper {
 		);
 	}
 
-	private static void logCannonSquibCalculation(Entity projectile, double projectileMassKg, float cbcChargePower, double travelledMeters, double finalGasColumnLengthMeters, double projectileDiameterMeters, double idealVelocityMps, double idealProjectileEnergyJ, double slidingWorkJ, double shotStartWorkJ, double requiredWorkJ, boolean squib) {
+	private static void logCannonSquibCalculation(Entity projectile, double projectileMassKg, float cbcChargePower, CannonPropellantProfile propellantProfile, double travelledMeters, double finalGasColumnLengthMeters, double projectileDiameterMeters, double idealVelocityMps, double idealProjectileEnergyJ, double slidingWorkJ, double shotStartWorkJ, double requiredWorkJ, boolean squib) {
 		if (!Config.debugBallistics()) return;
 
-		double chargeEquivalent = cbcChargePower / 2.0D;
-		double powderMassKg = chargeEquivalent * BallisticsParameterRegistry.cannonPowderMass();
-		double chargeLengthMeters = chargeEquivalent * BallisticsParameterRegistry.cannonChargeLength();
-
 		GoingBallistic.LOGGER.info(
-				"[Going Ballistic] Cannon squib check: projectile={}, mass={} kg, chargePower={}, chargeEquivalent={}, powderMass={} kg, chargeLength={} m, travelled={} m, finalGasColumnLength={} m, projectileDiameter={} m, idealVelocity={} m/s, idealEnergy={} J, slidingWork={} J, shotStartWork={} J, requiredWork={} J, squib={}",
+				"[Going Ballistic] Cannon squib check: " +
+						"projectile={}, " +
+						"mass={} kg, " +
+						"chargePower={}, " +
+						"chargeEquivalent={}, " +
+						"powderMass={} kg, " +
+						"chargeLength={} m, " +
+						"travelled={} m, " +
+						"finalGasColumnLength={} m, " +
+						"projectileDiameter={} m, " +
+						"idealVelocity={} m/s, " +
+						"idealEnergy={} J, " +
+						"slidingWork={} J, " +
+						"shotStartWork={} J, " +
+						"requiredWork={} J, " +
+						"squib={}",
 				getProjectileId(projectile),
 				projectileMassKg,
 				cbcChargePower,
-				chargeEquivalent,
-				powderMassKg,
-				chargeLengthMeters,
+				propellantProfile.capturedChargePower(),
+				propellantProfile.powderMassKg(),
+				propellantProfile.chargeLengthMeters(),
 				travelledMeters,
 				finalGasColumnLengthMeters,
 				projectileDiameterMeters,
@@ -517,6 +649,41 @@ public final class BallisticProjectileHelper {
 			}
 		}
 		return null;
+	}
+
+	private record CannonPropellantProfile(
+			double powderMassKg,
+			double chargeLengthMeters,
+			double velocityMultiplier,
+			double capturedChargePower,
+			double fallbackChargeEquivalent
+	) {
+		private CannonPropellantProfile {
+			if (!Double.isFinite(powderMassKg) || powderMassKg < 0.0D) powderMassKg = 0.0D;
+			if (!Double.isFinite(chargeLengthMeters) || chargeLengthMeters < 0.0D) chargeLengthMeters = 0.0D;
+			if (!Double.isFinite(velocityMultiplier) || velocityMultiplier <= 0.0D) velocityMultiplier = 1.0D;
+			if (!Double.isFinite(capturedChargePower) || capturedChargePower < 0.0D) capturedChargePower = 0.0D;
+			if (!Double.isFinite(fallbackChargeEquivalent) || fallbackChargeEquivalent < 0.0D) fallbackChargeEquivalent = 0.0D;
+		}
+	}
+
+	private static final class BigCannonShotCapture {
+		private final HolderLookup.Provider registries;
+		private double capturedChargePower;
+		private double powderMassKg;
+		private double chargeLengthMeters;
+		private double velocityMultiplier = 1.0D;
+
+		private BigCannonShotCapture(HolderLookup.Provider registries) {
+			this.registries = registries;
+		}
+
+		private void add(double chargePower, double powderMassKg, double chargeLengthMeters, double velocityMultiplier) {
+			this.capturedChargePower += Math.max(chargePower, 0.0D);
+			this.powderMassKg += Math.max(powderMassKg, 0.0D);
+			this.chargeLengthMeters += Math.max(chargeLengthMeters, 0.0D);
+			if (Double.isFinite(velocityMultiplier) && velocityMultiplier > 0.0D) this.velocityMultiplier *= velocityMultiplier;
+		}
 	}
 
 	public record BarrelProfile(double lengthMeters, double velocityMultiplier) {

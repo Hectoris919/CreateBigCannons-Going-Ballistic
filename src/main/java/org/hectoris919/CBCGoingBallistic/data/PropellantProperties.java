@@ -31,7 +31,8 @@ public record PropellantProperties(
 	public double resolvedChargeLengthMeters() {
 		if (this.chargeLengthOverrideMeters != null) return this.chargeLengthOverrideMeters;
 		return switch (this.kind) {
-			case BIG_CANNON_CHARGE, BIG_CANNON_CARTRIDGE -> Math.max(this.chargeEquivalents, 0.0D) * BallisticsParameterRegistry.cannonChargeLength();
+			case BIG_CANNON_CHARGE -> Math.max(this.chargeEquivalents, 0.0D) * BallisticsParameterRegistry.cannonChargeLength();
+			case BIG_CANNON_CARTRIDGE -> this.chargeEquivalents > 0.0D ? BallisticsParameterRegistry.cannonChargeLength() : 0.0D;
 			case AUTOCANNON_CARTRIDGE, MACHINE_GUN_ROUND -> BallisticsParameterRegistry.autocannonCartridgeLength();
 		};
 	}
