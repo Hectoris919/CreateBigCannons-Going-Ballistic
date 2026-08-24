@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
 public final class GoingBallisticMixinPlugin implements IMixinConfigPlugin {
 	private static final String SABLE_MIXIN = "org.hectoris919.CBCGoingBallistic.mixin.SableCompatMixin";
+	private static final String TERMINAL_BALLISTICS_MIXIN = "org.hectoris919.CBCGoingBallistic.mixin.TerminalBallisticsImpactServiceMixin";
 
 	@Override
 	public void onLoad(String mixinPackage) { }
@@ -18,10 +19,15 @@ public final class GoingBallisticMixinPlugin implements IMixinConfigPlugin {
 
 	@Override
 	public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-		if (!SABLE_MIXIN.equals(mixinClassName)) return true;
+		if (SABLE_MIXIN.equals(mixinClassName)) return isModLoaded("sable");
+		if (TERMINAL_BALLISTICS_MIXIN.equals(mixinClassName)) return isModLoaded("cbc_terminal_ballistics");
+		return true;
+	}
+
+	private static boolean isModLoaded(String modId) {
 		try {
 			LoadingModList loadingModList = LoadingModList.get();
-			return loadingModList != null && loadingModList.getModFileById("sable") != null;
+			return loadingModList != null && loadingModList.getModFileById(modId) != null;
 		} catch (RuntimeException | LinkageError ex) {
 			return false;
 		}

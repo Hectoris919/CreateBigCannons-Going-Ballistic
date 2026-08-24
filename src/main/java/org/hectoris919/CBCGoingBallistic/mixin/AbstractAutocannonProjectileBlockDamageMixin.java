@@ -3,6 +3,7 @@ package org.hectoris919.CBCGoingBallistic.mixin;
 import org.hectoris919.CBCGoingBallistic.Config;
 import org.hectoris919.CBCGoingBallistic.ballistics.BallisticProjectileHelper;
 import org.hectoris919.CBCGoingBallistic.ballistics.BlockDamageMath;
+import org.hectoris919.CBCGoingBallistic.ballistics.BlockDamageMath.ImpactSolution;
 import org.hectoris919.CBCGoingBallistic.ballistics.SableImpulseMath;
 import org.hectoris919.CBCGoingBallistic.data.BallisticsParameterRegistry;
 import org.spongepowered.asm.mixin.Mixin;
@@ -13,6 +14,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -35,7 +38,7 @@ public abstract class AbstractAutocannonProjectileBlockDamageMixin extends Abstr
 		super(type, level);
 	}
 
-	@Inject(method = "calculateBlockPenetration", at = @At("HEAD"), cancellable = true)
+	@Inject(method = "calculateBlockPenetration", at = @At("HEAD"), cancellable = true, order = 2000)
 	private void goingballistic$replaceAutocannonBlockPenetration(ProjectileContext projectileContext, BlockState state, BlockHitResult blockHitResult, CallbackInfoReturnable<ImpactResult> cir) {
 		if (Config.disableRealisticBlockDamage()) return;
 
@@ -50,48 +53,39 @@ public abstract class AbstractAutocannonProjectileBlockDamageMixin extends Abstr
 		Vec3 accel = this.getForces(this.position(), this.getDeltaMovement());
 		Vec3 curVel = this.getDeltaMovement().add(accel);
 		Vec3 normal = CBCUtils.getSurfaceNormalVector(this.level(), blockHitResult);
-		double incidence = BlockDamageMath.incidence(curVel, normal);
-		double velocityMps = BlockDamageMath.velocityBlocksPerTickToMetersPerSecond(curVel.length());
 		double massKg = BallisticProjectileHelper.getProjectileMassKg(this, BallisticsParameterRegistry.autocannonProjectileMassFallback());
-
-		double impactEnergyJ = BlockDamageMath.impactEnergyJ(massKg, velocityMps);
 		double toughness = blockArmor.toughness(this.level(), state, pos, true);
-		double requiredWorkJ = BlockDamageMath.perforationWorkJ(toughness, incidence);
-		double hardnessPenalty = Math.max(blockArmor.hardness(this.level(), state, pos, true) - ballistics.penetration(), 0.0D);
-
-		double projectileDeflection = ballistics.deflection();
-		double baseChance = CBCConfigs.server().munitions.baseProjectileBounceChance.getF();
-		double bounceChance = projectileDeflection < 1.0E-2D || incidence > projectileDeflection
-				? 0.0D
-				: Math.max(baseChance, 1.0D - incidence / projectileDeflection);
-		boolean surfaceImpact = this.lastPenetratedBlock.isAir();
+		double hardness = blockArmor.hardness(this.level(), state, pos, true);
+		boolean surfaceImpact = this.canHitSurface();
 		boolean canBounce = CBCConfigs.server().munitions.projectilesCanBounce.get();
-
-		ImpactResult.KinematicOutcome outcome;
-		if (surfaceImpact && canBounce && this.level().getRandom().nextDouble() < bounceChance) {
-			outcome = ImpactResult.KinematicOutcome.BOUNCE;
-		} else {
-			outcome = ImpactResult.KinematicOutcome.STOP;
-		}
-
-		boolean shatter = surfaceImpact && outcome != ImpactResult.KinematicOutcome.BOUNCE && hardnessPenalty > ballistics.toughness();
-
+		double bounceRoll = surfaceImpact && canBounce ? this.level().getRandom().nextDouble() : 1.0D;
 		float initialDurabilityMass = this.getProjectileMass();
-		if (outcome == ImpactResult.KinematicOutcome.STOP) this.setProjectileMass(0.0F);
 
-		double depositedEnergyJ = outcome == ImpactResult.KinematicOutcome.BOUNCE
-				? BlockDamageMath.bounceDepositedEnergyJ(impactEnergyJ, incidence)
-				: impactEnergyJ;
-		double structuralCoupling = BlockDamageMath.autocannonStructuralDamageCoupling(massKg);
-		double structurallyCoupledEnergyJ = depositedEnergyJ * structuralCoupling;
-		double damagePoints = unbreakable
-				? 0.0D
-				: BlockDamageMath.partialDamagePoints(structurallyCoupledEnergyJ, requiredWorkJ, toughness);
+		ImpactSolution impact = BlockDamageMath.solveImpact(
+				curVel,
+				normal,
+				massKg,
+				toughness,
+				hardness,
+				ballistics.penetration(),
+				ballistics.toughness(),
+				ballistics.deflection(),
+				initialDurabilityMass,
+				surfaceImpact,
+				canBounce,
+				unbreakable,
+				!this.level().isClientSide,
+				CBCConfigs.server().munitions.baseProjectileBounceChance.getF(),
+				bounceRoll
+		);
 
-		Vec3 postImpactVelocity = outcome == ImpactResult.KinematicOutcome.BOUNCE
-				? SableImpulseMath.bouncedVelocity(curVel, normal)
-				: Vec3.ZERO;
-		SableImpulseMath.captureImpactImpulse(this, massKg, curVel, postImpactVelocity);
+		ImpactResult.KinematicOutcome outcome = impact.outcome();
+		boolean blockBroken = impact.blockBroken();
+		boolean shatter = impact.shatter();
+
+		SableImpulseMath.captureImpactImpulse(this, massKg, curVel, impact.postImpactVelocity());
+
+		state.onProjectileHit(this.level(), state, blockHitResult, this);
 
 		if (!this.level().isClientSide) {
 			boolean bounced = outcome == ImpactResult.KinematicOutcome.BOUNCE;
@@ -105,30 +99,31 @@ public abstract class AbstractAutocannonProjectileBlockDamageMixin extends Abstr
 			for (BlockState containedState : blockArmor.containedBlockStates(this.level(), state, pos.immutable(), true)) {
 				projectileContext.addPlayedEffect(new ClientboundPlayBlockHitEffectPacket(containedState, this.getType(), bounced, true, hitLoc.x, hitLoc.y, hitLoc.z, (float) effectNormal.x, (float) effectNormal.y, (float) effectNormal.z));
 			}
-			if (damagePoints > 1.0E-6D) {
-				CreateBigCannons.BLOCK_DAMAGE.damageBlock(pos.immutable(), (float) damagePoints, state, this.level());
+			if (impact.partialDamagePoints() > 1.0E-6D) {
+				CreateBigCannons.BLOCK_DAMAGE.damageBlock(pos.immutable(), (float) impact.partialDamagePoints(), state, this.level());
 			}
+		}
+
+		BlockDamageMath.logImpact("Autocannon", this, massKg, impact);
+
+		if (blockBroken) {
+			this.setDeltaMovement(impact.postImpactVelocity());
+			this.setProjectileMass(Math.max(initialDurabilityMass - impact.durabilityPenalty(), 0.0F));
+			this.level().setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL_IMMEDIATE);
+		} else if (outcome == ImpactResult.KinematicOutcome.STOP) {
+			this.setProjectileMass(0.0F);
+			if (!this.level().isClientSide) this.impactPos = pos;
+		} else {
+			this.setProjectileMass(Math.max(initialDurabilityMass - impact.durabilityPenalty() / 2.0F, 0.0F));
 		}
 
 		this.massLost = ballistics.durabilityMass() < 1.0E-4D
 				? 0.0F
 				: ((initialDurabilityMass - this.getProjectileMass()) / ballistics.durabilityMass());
-		BlockDamageMath.logAutocannonImpact(
-				this,
-				massKg,
-				velocityMps,
-				incidence,
-				impactEnergyJ,
-				requiredWorkJ,
-				depositedEnergyJ,
-				structuralCoupling,
-				structurallyCoupledEnergyJ,
-				damagePoints,
-				hardnessPenalty,
-				outcome.name()
-		);
-
-		this.onImpact(blockHitResult, new ImpactResult(outcome, shatter), projectileContext);
-		cir.setReturnValue(new ImpactResult(outcome, !this.level().isClientSide && (shatter || outcome != ImpactResult.KinematicOutcome.BOUNCE)));
+		boolean onImpactRemove = this.onImpact(blockHitResult, new ImpactResult(outcome, shatter), projectileContext);
+		boolean shouldRemove = onImpactRemove
+				|| shatter
+				|| outcome == ImpactResult.KinematicOutcome.STOP;
+		cir.setReturnValue(new ImpactResult(outcome, !this.level().isClientSide && shouldRemove));
 	}
 }

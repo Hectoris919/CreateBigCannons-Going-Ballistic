@@ -8,12 +8,14 @@
     "AbstractCannonProjectileBlockDamageMixin",
     "AbstractCannonProjectilePhysicsMixin",
     "AbstractCannonProjectileShotDataMixin",
+    "AbstractCannonProjectileCompatAccessor",
     "FluidShellProjectileAccessor",
     "MortarStoneProjectileMixin",
     "MountedAutocannonContraptionMixin",
     "MountedCannonContraptionMixin",
     "MountedCannonPropellantContextMixin",
-    "SableCompatMixin"
+    "SableCompatMixin",
+    "TerminalBallisticsImpactServiceMixin"
   ],
   "client": [],
   "injectors": {
