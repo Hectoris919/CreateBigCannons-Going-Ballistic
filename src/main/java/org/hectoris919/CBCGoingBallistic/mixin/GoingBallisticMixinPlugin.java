@@ -8,6 +8,8 @@ import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
 public final class GoingBallisticMixinPlugin implements IMixinConfigPlugin {
+	private static final String RADARS_FACTORY_MIXIN = "org.hectoris919.CBCGoingBallistic.mixin.CreateRadarsSimpleModelMixin";
+	private static final String RADARS_MIXIN = "org.hectoris919.CBCGoingBallistic.mixin.CreateRadarsProjectileModelMixin";
 	private static final String SABLE_MIXIN = "org.hectoris919.CBCGoingBallistic.mixin.SableCompatMixin";
 	private static final String TERMINAL_BALLISTICS_MIXIN = "org.hectoris919.CBCGoingBallistic.mixin.TerminalBallisticsImpactServiceMixin";
 
@@ -19,6 +21,8 @@ public final class GoingBallisticMixinPlugin implements IMixinConfigPlugin {
 
 	@Override
 	public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
+		if (RADARS_FACTORY_MIXIN.equals(mixinClassName)) return isModLoaded("create_radar");
+		if (RADARS_MIXIN.equals(mixinClassName)) return isModLoaded("create_radar");
 		if (SABLE_MIXIN.equals(mixinClassName)) return isModLoaded("sable");
 		if (TERMINAL_BALLISTICS_MIXIN.equals(mixinClassName)) return isModLoaded("cbc_terminal_ballistics");
 		return true;

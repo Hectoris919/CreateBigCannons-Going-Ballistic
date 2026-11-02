@@ -1,6 +1,5 @@
 package org.hectoris919.CBCGoingBallistic.mixin;
 
-import org.hectoris919.CBCGoingBallistic.Config;
 import org.hectoris919.CBCGoingBallistic.ballistics.TerminalBallisticsCompat;
 import org.hectoris919.CBCGoingBallistic.ballistics.TerminalBallisticsCompat.CachedImpact;
 import org.spongepowered.asm.mixin.Mixin;
@@ -13,7 +12,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import rbasamoyai.createbigcannons.munitions.AbstractCannonProjectile.ImpactResult;
 
 @Pseudo
 @Mixin(targets = "com.cbc_terminal_ballistics.ballistics.TBImpactService", remap = false)
@@ -57,7 +55,8 @@ public abstract class TerminalBallisticsImpactServiceMixin {
 		CachedImpact impact = TerminalBallisticsCompat.getOrCompute(projectile, projectileContext, state, hit, autocannonHint);
 		if (impact == null) return original;
 		double ratio = TerminalBallisticsCompat.penetrationRatio(impact);
-		return Double.isNaN(ratio) ? original : ratio;
+		if (Double.isNaN(ratio)) return original;
+		return Math.min(ratio, 1.0D);
 	}
 
 	@ModifyVariable(method = "calculate", at = @At("STORE"), name = "impactSeverity", require = 0)
@@ -74,7 +73,7 @@ public abstract class TerminalBallisticsImpactServiceMixin {
 	}
 
 	@Inject(method = "calculate", at = @At("RETURN"), require = 0)
-	private static void goingballistic$applyTerminalBallisticsPostImpactPhysics(
+	private static void goingballistic$clearTerminalBallisticsCache(
 			Entity projectile,
 			Object projectileContext,
 			BlockState state,
@@ -82,16 +81,6 @@ public abstract class TerminalBallisticsImpactServiceMixin {
 			boolean autocannonHint,
 			CallbackInfoReturnable<Object> cir
 	) {
-		CachedImpact impact = TerminalBallisticsCompat.peek(projectile, hit);
-		try {
-			if (Config.disableRealisticBlockDamage() || impact == null) return;
-			Object returned = cir.getReturnValue();
-			if (returned instanceof ImpactResult result
-					&& result.kinematics() == ImpactResult.KinematicOutcome.PENETRATE) {
-				TerminalBallisticsCompat.applyPenetrationKinematics(projectile, impact);
-			}
-		} finally {
-			TerminalBallisticsCompat.clear(projectile);
-		}
+		TerminalBallisticsCompat.clear(projectile);
 	}
 }

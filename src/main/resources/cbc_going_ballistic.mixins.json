@@ -6,9 +6,11 @@
   "mixins": [
     "AbstractAutocannonProjectileBlockDamageMixin",
     "AbstractCannonProjectileBlockDamageMixin",
+    "AbstractCannonProjectileCompatAccessor",
     "AbstractCannonProjectilePhysicsMixin",
     "AbstractCannonProjectileShotDataMixin",
-    "AbstractCannonProjectileCompatAccessor",
+    "CreateRadarsProjectileModelMixin",
+    "CreateRadarsSimpleModelMixin",
     "FluidShellProjectileAccessor",
     "MortarStoneProjectileMixin",
     "MountedAutocannonContraptionMixin",

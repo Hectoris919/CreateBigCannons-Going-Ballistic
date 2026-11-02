@@ -11,12 +11,16 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import rbasamoyai.createbigcannons.config.CBCConfigs;
 import rbasamoyai.createbigcannons.munitions.AbstractCannonProjectile;
 import rbasamoyai.createbigcannons.munitions.ProjectileContext;
 
 @Pseudo
 @Mixin(targets = "rbasamoyai.createbigcannons.compat.sable.SableCompat", remap = false)
 public abstract class SableCompatMixin {
+	@Unique
+	private static final double goingballistic$defaultSableMultiplier = 40.0D;
+
 	@Unique
 	private static final ThreadLocal<Double> goingballistic$recoilScale = new ThreadLocal<>();
 
@@ -47,7 +51,7 @@ public abstract class SableCompatMixin {
 	)
 	private static double goingballistic$replaceRecoilMagnitude(double originalScale) {
 		Double replacement = goingballistic$recoilScale.get();
-		return replacement == null ? originalScale : replacement;
+		return replacement == null ? originalScale : replacement * (originalScale / goingballistic$defaultSableMultiplier);
 	}
 
 	@Inject(method = "recoilCannon", at = @At("RETURN"), require = 1)
@@ -71,8 +75,6 @@ public abstract class SableCompatMixin {
 			return;
 		}
 
-		// See recoil handling above: CBC's default 40x multiplier calibrates its own
-		// velocity-based impactPower values, not a physical momentum impulse.
 		goingballistic$impactImpulse.set(physicalImpulse);
 	}
 
@@ -85,7 +87,7 @@ public abstract class SableCompatMixin {
 	)
 	private static double goingballistic$replaceImpactMagnitude(double originalScale) {
 		Double replacement = goingballistic$impactImpulse.get();
-		return replacement == null ? originalScale : replacement;
+		return replacement == null ? originalScale : replacement * (CBCConfigs.server().compat.sableImpactForceMultiplier.get() / goingballistic$defaultSableMultiplier);
 	}
 
 	@Inject(method = "impactContraption", at = @At("RETURN"), require = 1)

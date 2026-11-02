@@ -10,6 +10,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import rbasamoyai.createbigcannons.munitions.AbstractCannonProjectile;
 import rbasamoyai.createbigcannons.munitions.config.DimensionMunitionPropertiesHandler;
+import rbasamoyai.createbigcannons.munitions.config.FluidDragHandler;
+import net.minecraft.world.level.material.FluidState;
 
 @Mixin(AbstractCannonProjectile.class)
 public abstract class AbstractCannonProjectilePhysicsMixin {
@@ -21,6 +23,10 @@ public abstract class AbstractCannonProjectilePhysicsMixin {
 		}
 
 		AbstractCannonProjectile projectile = (AbstractCannonProjectile) (Object) this;
+		if (projectile.isNoGravity()) {
+			cir.setReturnValue(0.0D);
+			return;
+		}
 
 		double dimensionGravityMultiplier = DimensionMunitionPropertiesHandler
 				.getProperties(projectile.level())
@@ -48,7 +54,10 @@ public abstract class AbstractCannonProjectilePhysicsMixin {
 				.getProperties(projectile.level())
 				.dragMultiplier();
 
-		double airDensityKgPerM3 = BallisticsParameterRegistry.airDensity() * dimensionDragMultiplier;
+		FluidState fluid = projectile.level().getFluidState(projectile.blockPosition());
+		double fluidDrag = fluid.isEmpty() ? 0.0D : FluidDragHandler.getFluidDrag(fluid);
+		double densityMultiplier = Math.max(0.0D, dimensionDragMultiplier + fluidDrag);
+		double airDensityKgPerM3 = BallisticsParameterRegistry.airDensity() * densityMultiplier;
 
 		double dragAcceleration = ProjectilePhysicsMath.dragAccelerationBlocksPerTickSquared(
 				projectile,

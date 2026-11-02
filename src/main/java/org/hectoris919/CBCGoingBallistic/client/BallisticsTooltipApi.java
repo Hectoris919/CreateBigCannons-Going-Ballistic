@@ -119,14 +119,17 @@ public final class BallisticsTooltipApi {
 	private static PropellantTooltipData getPropellantTooltipData(ItemStack stack, ResourceLocation itemId, ResourceLocation projectileId) {
 		PropellantProperties propellant = PropellantRegistry.get(stack, registryAccess()).orElseGet(() -> PropellantRegistry.get(itemId).orElse(null));
 		if (propellant != null) {
-			double powderMassKg = resolvePowderMass(stack, itemId, projectileId, propellant);
-			return new PropellantTooltipData(powderMassKg, powderMassKg * BallisticsParameterRegistry.blackPowderEnergyJoulesPerKg());
+			double powderMassKg = resolvePowderMass(stack, itemId, propellant);
+			double specificEnergy = propellant.kind() == PropellantProperties.PropellantKind.BIG_CANNON_CARTRIDGE
+					? BallisticsParameterRegistry.nitropowderSpecificEnergyJoulesPerKg()
+					: BallisticsParameterRegistry.blackPowderEnergyJoulesPerKg();
+			return new PropellantTooltipData(powderMassKg, powderMassKg * specificEnergy);
 		}
 
 		if (BIG_CARTRIDGE.equals(itemId) || FILLED_BIG_CARTRIDGE.equals(itemId)) {
-			double chargeEquivalents = estimateBigCartridgeChargeEquivalents(stack);
-			double powderMassKg = chargeEquivalents * BallisticsParameterRegistry.cannonPowderMass();
-			return new PropellantTooltipData(powderMassKg, powderMassKg * BallisticsParameterRegistry.blackPowderEnergyJoulesPerKg());
+			double fillFraction = PropellantProperties.nitropowderFillFraction(stack.getOrDefault(CBCDataComponents.POWER, 0));
+			double powderMassKg = PropellantProperties.nitropowderMassKg(fillFraction);
+			return new PropellantTooltipData(powderMassKg, powderMassKg * BallisticsParameterRegistry.nitropowderSpecificEnergyJoulesPerKg());
 		}
 
 		if (AUTOCANNON_CARTRIDGE.equals(itemId) || FILLED_AUTOCANNON_CARTRIDGE.equals(itemId)) {
@@ -137,9 +140,9 @@ public final class BallisticsTooltipApi {
 		return null;
 	}
 
-	private static double resolvePowderMass(ItemStack stack, ResourceLocation itemId, ResourceLocation projectileId, PropellantProperties propellant) {
-		if ((BIG_CARTRIDGE.equals(itemId) || FILLED_BIG_CARTRIDGE.equals(itemId)) && stack.has(CBCDataComponents.POWER)) {
-			return estimateBigCartridgeChargeEquivalents(stack) * BallisticsParameterRegistry.cannonPowderMass();
+	private static double resolvePowderMass(ItemStack stack, ResourceLocation projectileId, PropellantProperties propellant) {
+		if (propellant.kind() == PropellantProperties.PropellantKind.BIG_CANNON_CARTRIDGE) {
+			return propellant.resolvedNitropowderMassKg(PropellantProperties.nitropowderFillFraction(stack.getOrDefault(CBCDataComponents.POWER, 0)));
 		}
 		if (propellant.kind() == PropellantProperties.PropellantKind.AUTOCANNON_CARTRIDGE && projectileId != null) {
 			ProjectileMassProperties projectileProperties = ProjectileMassRegistry.getProperties(projectileId).orElse(null);
@@ -160,14 +163,6 @@ public final class BallisticsTooltipApi {
 		return properties == null
 				? BallisticsParameterRegistry.autocannonPowderMass()
 				: properties.autocannonPowderMassKgOr(BallisticsParameterRegistry.autocannonPowderMass());
-	}
-
-	private static double estimateBigCartridgeChargeEquivalents(ItemStack stack) {
-		int storedPower = stack.getOrDefault(CBCDataComponents.POWER, 0);
-		if (storedPower <= 0) return 0.0D;
-		return storedPower <= 4
-				? storedPower
-				: storedPower / 2.0D;
 	}
 
 	private static void appendPropellantLines(PropellantTooltipData propellant, List<Component> tooltip) {

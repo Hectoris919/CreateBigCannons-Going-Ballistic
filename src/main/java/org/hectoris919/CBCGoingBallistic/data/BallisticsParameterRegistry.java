@@ -3,7 +3,7 @@ package org.hectoris919.CBCGoingBallistic.data;
 public final class BallisticsParameterRegistry {
 	private static volatile Overrides overrides = Overrides.EMPTY;
 
-	private static final double BLACK_POWDER_DENSITY_KG_PER_M3 = 1700.0D;
+	private static final double BLACK_POWDER_DENSITY_KG_PER_M3 = 900.0D;
 	private static final double DEFAULT_CANNON_CHARGE_DIAMETER = (5.0D / 16.0D) + Math.sqrt(Math.pow(5.0D / 16.0D, 2.0D) + Math.pow(5.0D / 16.0D, 2.0D));
 	private static final double DEFAULT_AUTOCANNON_CHARGE_DIAMETER = (1.0D / 16.0D) + Math.sqrt(Math.pow(1.0D / 16.0D, 2.0D) + Math.pow(1.0D / 16.0D, 2.0D));
 	private static final double DEFAULT_CANNON_POWDER_MASS = BLACK_POWDER_DENSITY_KG_PER_M3 * Math.PI * Math.pow(((2.0D / 16.0D) + Math.sqrt(Math.pow(2.0D / 16.0D, 2.0D) + Math.pow(2.0D / 16.0D, 2.0D))) / 2.0D, 2.0D);
@@ -28,6 +28,8 @@ public final class BallisticsParameterRegistry {
 	public static double autocannonCartridgeDiameter() { return value(overrides.autocannonCartridgeDiameter, DEFAULT_AUTOCANNON_CHARGE_DIAMETER); }
 	public static double autocannonCartridgeLength() { return value(overrides.autocannonCartridgeLength, 0.75D); }
 	public static double blackPowderEnergyJoulesPerKg() { return value(overrides.blackPowderEnergyJoulesPerKg, 3000000.0D); }
+	public static double nitropowderDensityKgPerM3() { return value(overrides.nitropowderDensityKgPerM3, 950.0D); }
+	public static double nitropowderSpecificEnergyJoulesPerKg() { return value(overrides.nitropowderSpecificEnergyJoulesPerKg, 4000000.0D); }
 	public static double airDensity() { return value(overrides.airDensity, 1.225D); }
 	public static double projectileDragCoefficient() { return value(overrides.projectileDragCoefficient, 0.47D); }
 	public static double machineGunBulletRadius() { return value(overrides.machineGunBulletRadius, (0.00782D / 2.0D) * Math.cbrt(0.012D / 0.00945D)); }
@@ -63,6 +65,8 @@ public final class BallisticsParameterRegistry {
 				null,
 				null,
 				null,
+				null,
+				null,
 				null
 		);
 
@@ -77,6 +81,8 @@ public final class BallisticsParameterRegistry {
 		private final Double autocannonCartridgeDiameter;
 		private final Double autocannonCartridgeLength;
 		private final Double blackPowderEnergyJoulesPerKg;
+		private final Double nitropowderDensityKgPerM3;
+		private final Double nitropowderSpecificEnergyJoulesPerKg;
 		private final Double airDensity;
 		private final Double projectileDragCoefficient;
 		private final Double machineGunBulletRadius;
@@ -100,6 +106,8 @@ public final class BallisticsParameterRegistry {
 				Double autocannonCartridgeDiameter,
 				Double autocannonCartridgeLength,
 				Double blackPowderEnergyJoulesPerKg,
+				Double nitropowderDensityKgPerM3,
+				Double nitropowderSpecificEnergyJoulesPerKg,
 				Double airDensity,
 				Double projectileDragCoefficient,
 				Double machineGunBulletRadius,
@@ -122,6 +130,8 @@ public final class BallisticsParameterRegistry {
 			this.autocannonCartridgeDiameter = autocannonCartridgeDiameter;
 			this.autocannonCartridgeLength = autocannonCartridgeLength;
 			this.blackPowderEnergyJoulesPerKg = blackPowderEnergyJoulesPerKg;
+			this.nitropowderDensityKgPerM3 = nitropowderDensityKgPerM3;
+			this.nitropowderSpecificEnergyJoulesPerKg = nitropowderSpecificEnergyJoulesPerKg;
 			this.airDensity = airDensity;
 			this.projectileDragCoefficient = projectileDragCoefficient;
 			this.machineGunBulletRadius = machineGunBulletRadius;
@@ -146,6 +156,8 @@ public final class BallisticsParameterRegistry {
 					&& this.autocannonCartridgeDiameter == null
 					&& this.autocannonCartridgeLength == null
 					&& this.blackPowderEnergyJoulesPerKg == null
+					&& this.nitropowderDensityKgPerM3 == null
+					&& this.nitropowderSpecificEnergyJoulesPerKg == null
 					&& this.airDensity == null
 					&& this.projectileDragCoefficient == null
 					&& this.machineGunBulletRadius == null
@@ -171,6 +183,8 @@ public final class BallisticsParameterRegistry {
 		private Double autocannonCartridgeDiameter;
 		private Double autocannonCartridgeLength;
 		private Double blackPowderEnergyJoulesPerKg;
+		private Double nitropowderDensityKgPerM3;
+		private Double nitropowderSpecificEnergyJoulesPerKg;
 		private Double airDensity;
 		private Double projectileDragCoefficient;
 		private Double machineGunBulletRadius;
@@ -193,6 +207,8 @@ public final class BallisticsParameterRegistry {
 		void autocannonCartridgeDiameter(double value) { this.autocannonCartridgeDiameter = value; }
 		void autocannonCartridgeLength(double value) { this.autocannonCartridgeLength = value; }
 		void blackPowderEnergyJoulesPerKg(double value) { this.blackPowderEnergyJoulesPerKg = value; }
+		void nitropowderDensityKgPerM3(double value) { this.nitropowderDensityKgPerM3 = value; }
+		void nitropowderSpecificEnergyJoulesPerKg(double value) { this.nitropowderSpecificEnergyJoulesPerKg = value; }
 		void airDensity(double value) { this.airDensity = value; }
 		void projectileDragCoefficient(double value) { this.projectileDragCoefficient = value; }
 		void machineGunBulletRadius(double value) { this.machineGunBulletRadius = value; }
@@ -217,6 +233,8 @@ public final class BallisticsParameterRegistry {
 					this.autocannonCartridgeDiameter,
 					this.autocannonCartridgeLength,
 					this.blackPowderEnergyJoulesPerKg,
+					this.nitropowderDensityKgPerM3,
+					this.nitropowderSpecificEnergyJoulesPerKg,
 					this.airDensity,
 					this.projectileDragCoefficient,
 					this.machineGunBulletRadius,

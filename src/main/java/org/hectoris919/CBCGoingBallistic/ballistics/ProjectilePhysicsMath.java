@@ -23,8 +23,10 @@ public final class ProjectilePhysicsMath {
 	}
 
 	public static double referenceRadiusMeters(Entity projectile) {
-		ResourceLocation projectileId = BallisticProjectileHelper.getProjectileId(projectile);
+		return referenceRadiusMeters(BallisticProjectileHelper.getProjectileId(projectile));
+	}
 
+	public static double referenceRadiusMeters(ResourceLocation projectileId) {
 		if (projectileId == null) return cannonShellRadiusMeters();
 
 		String path = projectileId.getPath();

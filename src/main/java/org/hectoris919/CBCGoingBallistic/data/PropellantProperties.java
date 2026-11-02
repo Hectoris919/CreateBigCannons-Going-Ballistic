@@ -28,6 +28,33 @@ public record PropellantProperties(
 		};
 	}
 
+	public static double nitropowderFillFraction(int storedPower) {
+		return Math.clamp(storedPower, 0, 4) / 4.0D;
+	}
+
+	public static double nitropowderHeightMeters(double fillFraction) {
+		return (15.0D / 16.0D) * Math.clamp(fillFraction, 0.0D, 1.0D);
+	}
+
+	public static double nitropowderMassKg(double fillFraction) {
+		double side = 4.0D / 16.0D;
+		double radius = (side + Math.sqrt(side * side + side * side)) / 2.0D;
+		return Math.PI * radius * radius * nitropowderHeightMeters(fillFraction)
+				* BallisticsParameterRegistry.nitropowderDensityKgPerM3();
+	}
+
+	public double resolvedNitropowderMassKg(double fillFraction) {
+		if (this.kind != PropellantKind.BIG_CANNON_CARTRIDGE) return resolvedPowderMassKg();
+		if (this.powderMassOverrideKg != null) return this.powderMassOverrideKg * Math.clamp(fillFraction, 0.0D, 1.0D);
+		return nitropowderMassKg(fillFraction);
+	}
+
+	public double resolvedNitropowderChargeLengthMeters(double fillFraction) {
+		if (this.kind != PropellantKind.BIG_CANNON_CARTRIDGE) return resolvedChargeLengthMeters();
+		if (fillFraction <= 0.0D) return 0.0D;
+		return this.chargeLengthOverrideMeters != null ? this.chargeLengthOverrideMeters : nitropowderHeightMeters(1.0D);
+	}
+
 	public double resolvedChargeLengthMeters() {
 		if (this.chargeLengthOverrideMeters != null) return this.chargeLengthOverrideMeters;
 		return switch (this.kind) {

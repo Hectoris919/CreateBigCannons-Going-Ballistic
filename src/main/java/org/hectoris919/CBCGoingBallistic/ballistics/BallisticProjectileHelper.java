@@ -12,8 +12,13 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
+import net.minecraft.server.level.ServerLevel;
+import rbasamoyai.createbigcannons.cannons.big_cannons.IBigCannonBlockEntity;
+import rbasamoyai.createbigcannons.munitions.big_cannon.AbstractBigCannonProjectile;
+import rbasamoyai.createbigcannons.munitions.big_cannon.ProjectileBlock;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
+import rbasamoyai.createbigcannons.config.CBCConfigs;
 import org.hectoris919.CBCGoingBallistic.Config;
 import org.hectoris919.CBCGoingBallistic.api.GoingBallisticShotData;
 import org.hectoris919.CBCGoingBallistic.api.GoingBallisticShotDataHolder;
@@ -32,6 +37,11 @@ import rbasamoyai.createbigcannons.index.CBCDataComponents;
 import rbasamoyai.createbigcannons.munitions.big_cannon.fluid_shell.EndFluidStack;
 import rbasamoyai.createbigcannons.munitions.big_cannon.propellant.BigCannonPropellantBlock;
 import rbasamoyai.createbigcannons.munitions.autocannon.AutocannonCartridgeItem;
+import rbasamoyai.createbigcannons.cannon_control.contraption.MountedAutocannonContraption;
+import rbasamoyai.createbigcannons.cannons.autocannon.breech.AbstractAutocannonBreechBlockEntity;
+import rbasamoyai.createbigcannons.munitions.autocannon.AbstractAutocannonProjectile;
+import rbasamoyai.createbigcannons.munitions.autocannon.AutocannonAmmoItem;
+import rbasamoyai.createbigcannons.munitions.autocannon.ammo_container.AutocannonAmmoContainerItem;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 
@@ -84,6 +94,153 @@ public final class BallisticProjectileHelper {
 		SableImpulseMath.recordBigCannonProjectile(projectileMassKg, propellantProfile.powderMassKg(), velocityMps);
 		logCannonCalculation("launch", projectile, projectileMassKg, cbcChargePower, propellantProfile, barrelLengthMeters, velocityMps, velocityBlocksPerTick);
 		return velocityBlocksPerTick;
+	}
+
+	public static RadarShotEstimate estimateBigCannonForRadar(AbstractMountedCannonContraption cannon, ServerLevel level,
+			float cbcChargePower) {
+		if (cannon == null || level == null) return null;
+		Direction direction = cannon.initialOrientation();
+		BlockPos start = cannon.getStartPos();
+		if (direction == null || start == null || cannon.presentBlockEntities == null) return null;
+		try {
+		BlockPos projectilePos = start;
+		for (int i = 0; i < MAX_BARREL_SCAN_BLOCKS; ++i) {
+			if (!(cannon.presentBlockEntities.get(projectilePos) instanceof IBigCannonBlockEntity blockEntity)) return null;
+			StructureBlockInfo info = blockEntity.cannonBehavior().block();
+			if (info.state().getBlock() instanceof ProjectileBlock<?>) break;
+			projectilePos = projectilePos.relative(direction);
+		}
+
+		if (!(cannon.presentBlockEntities.get(projectilePos) instanceof IBigCannonBlockEntity firstEntity)) return null;
+		StructureBlockInfo first = firstEntity.cannonBehavior().block();
+		if (!(first.state().getBlock() instanceof ProjectileBlock<?> projectileBlock)) return null;
+		ResourceLocation projectileId = BuiltInRegistries.ENTITY_TYPE.getKey(projectileBlock.getAssociatedEntityType());
+		ProjectileMassProperties properties = ProjectileMassRegistry.getProperties(projectileId).orElse(null);
+		double massKg = properties == null ? BallisticsParameterRegistry.projectileMassFallback() : properties.massKg();
+		AbstractBigCannonProjectile previewProjectile = null;
+		if (properties != null && (properties.fluidContainer() || properties.projectileContainer())) {
+			previewProjectile = constructBigCannonPreview(cannon, level, projectilePos, direction, projectileBlock);
+			if (previewProjectile == null) return null;
+			massKg = getProjectileMassKg(previewProjectile);
+		}
+
+		BigCannonShotCapture capture = new BigCannonShotCapture(level.registryAccess());
+		BlockPos pos = start;
+		for (int j = 0; j < MAX_BARREL_SCAN_BLOCKS && !pos.equals(projectilePos); ++j) {
+			if (!(cannon.presentBlockEntities.get(pos) instanceof IBigCannonBlockEntity propellantEntity)) break;
+			StructureBlockInfo loaded = propellantEntity.cannonBehavior().block();
+			if (loaded.state().getBlock() instanceof BigCannonPropellantBlock powder
+					&& !(loaded.state().getBlock() instanceof ProjectileBlock<?>)) {
+				capturePhysicalPropellant(capture, powder, loaded, Math.max(0.0F, powder.getChargePower(loaded)));
+			}
+			pos = pos.relative(direction);
+		}
+		CannonPropellantProfile profile = resolveCannonPropellantProfile(cbcChargePower, capture);
+		if (!CBCConfigs.server().failure.disableAllFailure.get()) {
+			int travel = 0;
+			BlockPos borePos = projectilePos.relative(direction);
+			for (int i = 0; i < MAX_BARREL_SCAN_BLOCKS; i++, borePos = borePos.relative(direction)) {
+				if (!(cannon.presentBlockEntities.get(borePos) instanceof IBigCannonBlockEntity bore)) break;
+				StructureBlockInfo boreInfo = bore.cannonBehavior().block();
+				if (!boreInfo.state().isAir()) continue;
+				if (wouldCannonSquibAtTravel(massKg, profile, ++travel)) {
+					if (previewProjectile == null) previewProjectile = constructBigCannonPreview(
+							cannon, level, projectilePos, direction, projectileBlock);
+					if (previewProjectile != null && previewProjectile.canSquib()) return null;
+					break;
+				}
+			}
+		}
+		float speed = cannonVelocityBlocksPerTick(massKg, cbcChargePower, profile, estimateMountedBarrelProfile(cannon));
+		double drag = ProjectilePhysicsMath.quadraticDragCoefficient(massKg,
+				ProjectilePhysicsMath.cannonShellRadiusMeters(),
+				BallisticsParameterRegistry.projectileDragCoefficient(), BallisticsParameterRegistry.airDensity());
+		return new RadarShotEstimate(speed, drag);
+		} catch (RuntimeException | LinkageError ex) {
+			GoingBallistic.LOGGER.debug("Could not preview loaded big-cannon physics for Create: Radars", ex);
+			return null;
+		}
+	}
+
+	private static AbstractBigCannonProjectile constructBigCannonPreview(AbstractMountedCannonContraption cannon,
+			ServerLevel level, BlockPos pos, Direction direction, ProjectileBlock<?> block) {
+		java.util.List<StructureBlockInfo> parts = new java.util.ArrayList<>();
+		for (int i = 0; i < Math.min(16, block.getExpectedSize()); i++, pos = pos.relative(direction)) {
+			if (!(cannon.presentBlockEntities.get(pos) instanceof IBigCannonBlockEntity be)) return null;
+			StructureBlockInfo info = be.cannonBehavior().block();
+			parts.add(info);
+			if (block.isComplete(parts, direction)) return block.getProjectile(level, java.util.List.copyOf(parts));
+		}
+		return null;
+	}
+
+	public record RadarShotEstimate(float muzzleSpeedBlocksPerTick, double quadraticDragCoefficient) { }
+
+	private static float cannonVelocityBlocksPerTick(double projectileMassKg, float originalSpeed,
+			CannonPropellantProfile profile, BarrelProfile barrel) {
+		if (Config.disableRealisticBallistics()) return originalSpeed;
+		double velocityMps = BallisticsMath.getRobinsVelocityMps(projectileMassKg, profile.powderMassKg(),
+				profile.chargeLengthMeters(), barrel.lengthMeters(), profile.velocityMultiplier()) * barrel.velocityMultiplier();
+		float result = BallisticsMath.mpsToBPTFloat(velocityMps);
+		return result > 0.0F ? result : originalSpeed;
+	}
+
+	public static RadarShotEstimate estimateAutocannonForRadar(AbstractMountedCannonContraption cannon,
+			ServerLevel level, float originalVelocity) {
+		if (!(cannon instanceof MountedAutocannonContraption) || level == null
+				|| cannon.getStartPos() == null || cannon.presentBlockEntities == null) return null;
+		if (!(cannon.presentBlockEntities.get(cannon.getStartPos()) instanceof AbstractAutocannonBreechBlockEntity breech)) return null;
+		try {
+			ItemStack queued = breech.getInputBuffer().peekFirst();
+			ItemStack ammo = queued != null && !queued.isEmpty() ? queued.copy() : ItemStack.EMPTY;
+			if (ammo.isEmpty()) {
+				ItemStack magazine = breech.getMagazine();
+				if (!magazine.isEmpty()) ammo = AutocannonAmmoContainerItem.pollItemFromContainer(magazine.copy());
+			}
+			if (ammo.isEmpty() || !(ammo.getItem() instanceof AutocannonAmmoItem item)) return null;
+			GoingBallisticShotData shotData = buildShotDataFromAutocannonAmmoStack(ammo, level.registryAccess());
+
+			ItemStack projectileStack = ammo.getItem() instanceof AutocannonCartridgeItem
+					? AutocannonCartridgeItem.getProjectileStack(ammo) : ammo;
+			if (projectileStack.isEmpty()) projectileStack = ammo;
+			ResourceLocation projectileItemId = BuiltInRegistries.ITEM.getKey(projectileStack.getItem());
+			Optional<ResourceLocation> projectileId = ItemProjectileRegistry.getProjectileId(projectileStack, level.registryAccess())
+					.or(() -> ItemProjectileRegistry.getProjectileId(projectileItemId));
+			ProjectileMassProperties properties = projectileId.flatMap(ProjectileMassRegistry::getProperties).orElse(null);
+			AbstractAutocannonProjectile projectile = null;
+			if (properties == null || properties.fluidContainer() || properties.projectileContainer()) {
+				projectile = item.getAutocannonProjectile(ammo, level);
+				if (projectile == null) return null;
+				if (shotData != null) attachShotData(projectile, shotData);
+				properties = getProjectileMassProperties(projectile);
+			}
+			double massKg = projectile != null
+					? getProjectileMassKg(projectile, BallisticsParameterRegistry.autocannonProjectileMassFallback())
+					: shotData == null ? properties.massKg() : shotData.projectileMassKgOr(properties.massKg());
+			double powderMassKg = properties == null ? BallisticsParameterRegistry.autocannonPowderMass()
+					: properties.autocannonPowderMassKgOr(BallisticsParameterRegistry.autocannonPowderMass());
+			double chargeLength = properties == null ? BallisticsParameterRegistry.autocannonCartridgeLength()
+					: properties.autocannonChargeLengthMetersOr(BallisticsParameterRegistry.autocannonCartridgeLength());
+			double multiplier = properties == null ? 1.0D : properties.autocannonVelocityMultiplierOr(1.0D);
+			if (shotData != null) {
+				powderMassKg = shotData.powderMassKgOr(powderMassKg);
+				chargeLength = shotData.chargeLengthMetersOr(chargeLength);
+				multiplier *= shotData.velocityMultiplier();
+			}
+			BarrelProfile barrel = estimateMountedBarrelProfile(cannon);
+			double velocityMps = BallisticsMath.getRobinsVelocityMps(massKg, powderMassKg,
+					chargeLength, barrel.lengthMeters(), multiplier) * barrel.velocityMultiplier();
+			float speed = BallisticsMath.mpsToBPTFloat(velocityMps);
+			if (!(speed > 0.0F)) speed = originalVelocity;
+			double drag = ProjectilePhysicsMath.quadraticDragCoefficient(massKg,
+					projectile != null ? ProjectilePhysicsMath.referenceRadiusMeters(projectile)
+							: ProjectilePhysicsMath.referenceRadiusMeters(projectileId.orElse(null)),
+					BallisticsParameterRegistry.projectileDragCoefficient(), BallisticsParameterRegistry.airDensity());
+			return new RadarShotEstimate(speed, drag);
+		} catch (RuntimeException | LinkageError ex) {
+			GoingBallistic.LOGGER.debug("Could not preview loaded autocannon physics for Create: Radars", ex);
+			return null;
+		}
 	}
 
 	public static float calculateAutocannonLaunchVelocityBlocksPerTick(Entity projectile, float originalVelocity, AbstractMountedCannonContraption contraption) {
@@ -158,6 +315,16 @@ public final class BallisticProjectileHelper {
 		return squib;
 	}
 
+	private static boolean wouldCannonSquibAtTravel(double massKg, CannonPropellantProfile profile, int barrelTravelled) {
+		double travel = Math.max(barrelTravelled, 0);
+		double velocity = BallisticsMath.getRobinsVelocityMps(massKg, profile.powderMassKg(),
+				profile.chargeLengthMeters(), profile.chargeLengthMeters() + travel, profile.velocityMultiplier());
+		double bearingArea = Math.PI * BallisticsParameterRegistry.cannonChargeDiameter();
+		double requiredWork = DRY_BORE_SLIDING_SHEAR_STRESS_PA * bearingArea * travel
+				+ DRY_BORE_SHOT_START_SHEAR_STRESS_PA * bearingArea * SHOT_START_TRAVEL_METERS;
+		return kineticEnergyJ(massKg, velocity) <= requiredWork;
+	}
+
 	public static void beginBigCannonShot(HolderLookup.Provider registries) {
 		SableImpulseMath.beginBigCannonShot();
 		BIG_CANNON_SHOT_CAPTURE.set(new BigCannonShotCapture(registries));
@@ -198,14 +365,20 @@ public final class BallisticProjectileHelper {
 				if (properties != null
 						&& (properties.kind() == PropellantProperties.PropellantKind.BIG_CANNON_CHARGE
 						|| properties.kind() == PropellantProperties.PropellantKind.BIG_CANNON_CARTRIDGE)) {
-					double powderMassKg = properties.resolvedPowderMassKg();
-					double chargeLengthMeters = properties.resolvedChargeLengthMeters();
+					boolean nitropowder = properties.kind() == PropellantProperties.PropellantKind.BIG_CANNON_CARTRIDGE;
+					double fillFraction = PropellantProperties.nitropowderFillFraction(extractedStack.getOrDefault(CBCDataComponents.POWER, 0));
+					double powderMassKg = nitropowder
+							? properties.resolvedNitropowderMassKg(fillFraction)
+							: properties.resolvedPowderMassKg();
+					double chargeLengthMeters = nitropowder
+							? properties.resolvedNitropowderChargeLengthMeters(fillFraction)
+							: properties.resolvedChargeLengthMeters();
 					if (Double.isFinite(powderMassKg) && powderMassKg > 0.0D
 							&& Double.isFinite(chargeLengthMeters) && chargeLengthMeters > 0.0D) {
 						double velocityMultiplier = properties.velocityMultiplier();
 						recoilPowderMassKg = powderMassKg;
 						recoilVelocityMultiplier = velocityMultiplier;
-						capture.add(cbcChargePower, powderMassKg, chargeLengthMeters, velocityMultiplier);
+						capture.add(cbcChargePower, powderMassKg, chargeLengthMeters, velocityMultiplier, nitropowder ? powderMassKg : 0.0D);
 					}
 				}
 			}
@@ -216,9 +389,34 @@ public final class BallisticProjectileHelper {
 		SableImpulseMath.recordBigCannonPropellant(recoilPowderMassKg, recoilVelocityMultiplier);
 	}
 
+	private static void capturePhysicalPropellant(BigCannonShotCapture capture, BigCannonPropellantBlock propellant, StructureBlockInfo info, float cbcChargePower) {
+		if (cbcChargePower <= 0.0F) return;
+		try {
+			ItemStack extractedStack = propellant.getExtractedItem(info, capture.registries);
+			if (extractedStack == null || extractedStack.isEmpty()) return;
+			ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(extractedStack.getItem());
+			PropellantProperties properties = PropellantRegistry.get(extractedStack, capture.registries)
+					.or(() -> PropellantRegistry.get(itemId)).orElse(null);
+			if (properties == null || (properties.kind() != PropellantProperties.PropellantKind.BIG_CANNON_CHARGE
+					&& properties.kind() != PropellantProperties.PropellantKind.BIG_CANNON_CARTRIDGE)) return;
+			boolean nitropowder = properties.kind() == PropellantProperties.PropellantKind.BIG_CANNON_CARTRIDGE;
+			double fill = PropellantProperties.nitropowderFillFraction(extractedStack.getOrDefault(CBCDataComponents.POWER, 0));
+			double mass = nitropowder ? properties.resolvedNitropowderMassKg(fill) : properties.resolvedPowderMassKg();
+			double length = nitropowder ? properties.resolvedNitropowderChargeLengthMeters(fill) : properties.resolvedChargeLengthMeters();
+			if (Double.isFinite(mass) && mass > 0.0D && Double.isFinite(length) && length > 0.0D) {
+				capture.add(cbcChargePower, mass, length, properties.velocityMultiplier(), nitropowder ? mass : 0.0D);
+			}
+		} catch (RuntimeException | LinkageError ex) {
+			GoingBallistic.LOGGER.debug("Could not read physical big-cannon propellant data", ex);
+		}
+	}
+
 	private static CannonPropellantProfile resolveCannonPropellantProfile(float cbcChargePower) {
+		return resolveCannonPropellantProfile(cbcChargePower, BIG_CANNON_SHOT_CAPTURE.get());
+	}
+
+	private static CannonPropellantProfile resolveCannonPropellantProfile(float cbcChargePower, BigCannonShotCapture capture) {
 		double totalChargePower = Float.isFinite(cbcChargePower) ? Math.max(cbcChargePower, 0.0D) : 0.0D;
-		BigCannonShotCapture capture = BIG_CANNON_SHOT_CAPTURE.get();
 		if (capture == null || capture.capturedChargePower <= 0.0D || capture.powderMassKg <= 0.0D || capture.chargeLengthMeters <= 0.0D) {
 			double fallbackChargeEquivalent = totalChargePower / 2.0D;
 			return new CannonPropellantProfile(
@@ -234,6 +432,7 @@ public final class BallisticProjectileHelper {
 				? totalChargePower / capture.capturedChargePower
 				: 1.0D;
 		double powderMassKg = capture.powderMassKg * Math.max(capturedPowerScale, 0.0D);
+		double nitropowderMassKg = capture.nitropowderMassKg * Math.max(capturedPowerScale, 0.0D);
 		double chargeLengthMeters = capture.chargeLengthMeters;
 
 		double uncapturedChargePower = Math.max(totalChargePower - capture.capturedChargePower, 0.0D);
@@ -241,10 +440,16 @@ public final class BallisticProjectileHelper {
 		powderMassKg += fallbackChargeEquivalent * BallisticsParameterRegistry.cannonPowderMass();
 		chargeLengthMeters += fallbackChargeEquivalent * BallisticsParameterRegistry.cannonChargeLength();
 
+		double energyMultiplier = nitropowderMassKg > 0.0D && powderMassKg > 0.0D
+				? Math.sqrt(1.0D + (nitropowderMassKg / powderMassKg)
+						* (BallisticsParameterRegistry.nitropowderSpecificEnergyJoulesPerKg()
+						/ BallisticsParameterRegistry.blackPowderEnergyJoulesPerKg() - 1.0D))
+				: 1.0D;
+
 		return new CannonPropellantProfile(
 				powderMassKg,
 				chargeLengthMeters,
-				capture.velocityMultiplier,
+				capture.velocityMultiplier * energyMultiplier,
 				capture.capturedChargePower,
 				fallbackChargeEquivalent
 		);
@@ -671,6 +876,7 @@ public final class BallisticProjectileHelper {
 		private final HolderLookup.Provider registries;
 		private double capturedChargePower;
 		private double powderMassKg;
+		private double nitropowderMassKg;
 		private double chargeLengthMeters;
 		private double velocityMultiplier = 1.0D;
 
@@ -678,9 +884,10 @@ public final class BallisticProjectileHelper {
 			this.registries = registries;
 		}
 
-		private void add(double chargePower, double powderMassKg, double chargeLengthMeters, double velocityMultiplier) {
+		private void add(double chargePower, double powderMassKg, double chargeLengthMeters, double velocityMultiplier, double nitropowderMassKg) {
 			this.capturedChargePower += Math.max(chargePower, 0.0D);
 			this.powderMassKg += Math.max(powderMassKg, 0.0D);
+			this.nitropowderMassKg += Math.max(nitropowderMassKg, 0.0D);
 			this.chargeLengthMeters += Math.max(chargeLengthMeters, 0.0D);
 			if (Double.isFinite(velocityMultiplier) && velocityMultiplier > 0.0D) this.velocityMultiplier *= velocityMultiplier;
 		}
