@@ -75,9 +75,6 @@ public final class TerminalBallisticsCompat {
 		double toughness = blockArmor.toughness(projectile.level(), state, pos, true);
 		double hardness = blockArmor.hardness(projectile.level(), state, pos, true);
 
-		// TB keeps ownership of ricochet behavior. Disable bouncing here so the
-		// shared solver is used only for penetration, deposited work, durability
-		// and post-perforation velocity.
 		ImpactSolution solution = BlockDamageMath.solveImpact(
 				curVel,
 				normal,
@@ -109,6 +106,13 @@ public final class TerminalBallisticsCompat {
 		return result;
 	}
 
+	public static CachedImpact peek(Entity projectile, BlockHitResult hit) {
+		CachedImpact cached = IMPACT_CACHE.get(projectile);
+		if (cached == null) return null;
+		return cached.gameTime() == projectile.level().getGameTime()
+				&& cached.blockPos().equals(hit.getBlockPos()) ? cached : null;
+	}
+
 	public static void clear(Entity projectile) {
 		IMPACT_CACHE.remove(projectile);
 	}
@@ -119,12 +123,6 @@ public final class TerminalBallisticsCompat {
 		double impactEnergyJ = impact.solution().impactEnergyJ();
 		if (requiredWorkJ <= EPSILON) return impactEnergyJ > EPSILON ? Double.POSITIVE_INFINITY : 0.0D;
 		return Math.max(0.0D, impactEnergyJ / requiredWorkJ);
-	}
-
-	public static double integrityWorkFraction(CachedImpact impact) {
-		double ratio = penetrationRatio(impact);
-		if (!Double.isFinite(ratio)) return ratio > 0.0D ? 1.0D : 0.0D;
-		return Math.max(0.0D, Math.min(1.0D, ratio));
 	}
 
 	public record CachedImpact(
