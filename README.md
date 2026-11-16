@@ -52,7 +52,7 @@ I based the mass of gunpowder inside a powder charge off of what's visible on th
 |Big Cartridge (Power: 2/4)|127.4049 kg|
 |Big Cartridge (Power: 1/4)|63.7025 kg|
 |Powder Charge|64.3730 kg|
-|Autocannon Cartridge|11.8153 kg|
+|Autocannon Cartridge|22.7988 kg|
 |Machine Gun Cartridge|0.0035 kg|
 
 ## TODO:
